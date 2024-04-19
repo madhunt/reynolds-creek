@@ -1,0 +1,6 @@
+matplotlib==3.7.2
+matplotlib==3.5.1
+numpy==1.25.2
+numpy==1.21.5
+obspy==1.4.0
+pandas==2.0.3
