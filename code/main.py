@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
-import datetime, glob, obspy, os
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import cm
-import matplotlib.dates as mdates
+import argparse
+
+import glob, obspy, os
 import numpy as np
 from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
@@ -11,12 +10,17 @@ import pandas as pd
 
 from concurrent.futures import ProcessPoolExecutor
 
-def main(process=False, trace_plot=False, backaz_plot=False,
+import plot_utils
+
+def main(path_home, process=False, trace_plot=False, backaz_plot=False,
          filter_options=None):
 
+
+    print("entered main")
+
     #FIXME path stuff
-    path_curr = os.path.dirname(os.path.realpath(__file__))
-    path_home = os.path.abspath(os.path.join(path_curr, '..'))
+    #path_curr = os.path.dirname(os.path.realpath(__file__))
+    #path_home = os.path.abspath(os.path.join(path_curr, '..'))
     path_data = os.path.join(path_home, "data")
     
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
@@ -24,8 +28,8 @@ def main(process=False, trace_plot=False, backaz_plot=False,
                     f"processed_output_{filt_freq_str}.npy")
 
     #FIXME arguments into main or better
-    gem_list = ['138', '170', '155', '136', '150']#, '133']  # hopefully back az towards south
-    #FIXME removed 133 because data didnt start until 01-15T02
+    #gem_list = ['138', '170', '155', '136', '150']#, '133']  # hopefully back az towards south
+    gem_list=None
     
 
     filter_type = 'bandpass'
@@ -37,7 +41,7 @@ def main(process=False, trace_plot=False, backaz_plot=False,
     # plot individual traces
     if trace_plot == True:
         print("Plotting Traces")
-        plot_traces(data, path_home, filt_freq_str)
+        plot_utils.plot_traces(data, path_home, filt_freq_str)
 
     if process == True:
         print("Processing Data")
@@ -50,10 +54,12 @@ def main(process=False, trace_plot=False, backaz_plot=False,
     
     if backaz_plot == True:
         print("Plotting Backazimuth and Slowness")
-        plot_backaz_slowness(output, path_home, filt_freq_str)
+        plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
     
     return
 
+
+#TODO add option to specify a date range
 def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
     '''
     Loads in and pre-processes array data.
@@ -75,7 +81,7 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
     '''
     # paths to mseed and coordinates
     path_mseed = os.path.join(path_data, "mseed", "*.mseed")
-    path_coords = glob.glob(os.path.join(path_data, "*.csv" ))#"20240114_Bonfire_Gems.csv")
+    path_coords = glob.glob(os.path.join(path_data, "gps", "*.csv" ))#"20240114_Bonfire_Gems.csv")
 
     # import data as obspy stream
     data = obspy.read(path_mseed)
@@ -88,13 +94,13 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
     
     # get rid of any stations that don't have coordinates
     data_list = [trace for trace in data.traces 
-                    if trace.stats['station'] in coords["Name"].to_list()]
+                    if trace.stats['station'] in coords["Station"].to_list()]
     # convert list back to obspy stream
     data = obspy.Stream(traces=data_list)
 
     # assign coordinates to stations
     for _, row in coords.iterrows():
-        sn = row["Name"]
+        sn = row["Station"]
         for trace in data.select(station=sn):
             trace.stats.coordinates = AttribDict({
                 'latitude': row["Latitude"],
@@ -118,46 +124,6 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
         data_subset = obspy.Stream(traces=data_subset)
         return data_subset
     
-def plot_traces(data, path_home, filt_freq_str):
-    '''
-    Plots individual traces from each Gem and saves at 
-    path_home/figures/traces_{freqmin}_{freqmax}.png.
-    INPUTS
-        data : obspy stream : merged stream with data from all Gems to plot
-        path_home : str : path to main dir. Figure will be saved in "figures" subdir.
-        filt_freq_str : str : string with data filter frequencies ("freqmin_freqmax")
-    RETURNS
-        Saves figure at path_home/figures/traces.png
-    '''
-    # define number of traces
-    n = len(data)
-    #TODO make separate figures if plotting full array (if n > certain number)
-    fig, ax = plt.subplots(n, 1, sharex=True, sharey=True, tight_layout=True)
-    color = cm.rainbow(np.linspace(0, 1, n))
-
-    for i, trace in enumerate(data):
-        ax[i].plot(trace.times("matplotlib"), trace.data, c=color[i])
-        ax[i].grid()
-        ax[i].set_ylabel(trace.stats["station"])
-        ax[i].xaxis_date()
-
-        #TODO change this -- how to do this better?
-        ax[i].set_ylim([-100, 100])
-
-        #TODO make this better, ok for now
-        # plot fire start time
-        ax[i].axvline(datetime.datetime(2024, 1, 14, 22, 45), 
-                     color='k', linestyle='--', linewidth=2)
-
-    # label and format bottom x-axis
-    ax[n-1].set_xlabel("UTC Time")
-    fig.autofmt_xdate()
-    fig.suptitle(f"Individual Gem Traces (filtered {filt_freq_str})")
-
-    plt.savefig(os.path.join(path_home, "figures", f"traces_{filt_freq_str}.png"), dpi=500)
-    plt.close()
-    return
-
 def process_data(data, path_processed, time_start=None, time_end=None):
     '''
     Run obspy array_processing() function to beamform data. Save in .npy format to specified 
@@ -202,99 +168,35 @@ def process_data(data, path_processed, time_start=None, time_end=None):
     np.save(path_processed, output)
     return output
 
-def plot_backaz_slowness(output, path_home, filt_freq_str):
-    #TODO make this able to reuse for other data #FIXME
-    
-    #TODO have this as a func with user input slow min/max at some point
-    # only plot backaz with slowness near 3 s/km
-    slow_min = 2.9
-    slow_max = 3.1
-    output_constrain = []
-    for col in output.T:
-        col_constrain = [col[i] for i in range(len(col)) if slow_min < output[:,4][i] < slow_max]
-        col_constrain = np.array(col_constrain)
-        output_constrain.append(col_constrain)
-    output_constrain = np.array(output_constrain).T
-
-    fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True)
-    im0 = simple_beamform_plot('backaz', output_constrain, fig, ax[0])
-    
-    # plot notable landmarks
-    #ax[0].axhline(y=240)
-    #ax[0].axhline(y=42)
-    im1 = simple_beamform_plot('slowness', output, fig, ax[1])
-
-    for ax_i in ax:
-        ax_i.xaxis.set_major_locator(mdates.HourLocator(byhour=range(24)))
-        ax_i.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M"))
-        
-        #TODO make this better, ok for now
-        # plot fire start time
-        ax_i.axvline(datetime.datetime(2024, 1, 14, 22, 45), 
-                     color='k', linestyle='--', linewidth=2)
-
-    #ax[1].set_xlim([datetime.datetime(2024, 1, 15, 2, 30), datetime.datetime(2024, 1, 15, 4)])
-    ax[1].set_xlabel("UTC Time")
-    fig.autofmt_xdate()
-    fig.suptitle(f"Backazimuth and Slowness (filtered {filt_freq_str})")
-    plt.savefig(os.path.join(path_home, "figures", f"backaz_slowness_{filt_freq_str}.png"), dpi=500)
-    plt.close()
-    #plt.show()
-    return
-
-#TODO think about this... there's probably a neater way to consolidate and reuse this func
-# will leave for now and wait for other plotting needs
-def simple_beamform_plot(plot_type, output, fig, ax):
-    '''
-    Plots beackazimuth or slowness on given figure, along with colorbar. Assumes output array 
-    includes columns in the same order as output of array_processing().
-    INPUTS
-        plot_type : str : 'backaz' or 'slowness'
-        output : np array : array with 5 rows containing output of array_processing() function. 
-            This includes time, semblance, abs power, backazimuth, and slowness.
-        fig, ax : pyplot handles(?) : handles(?) to figure and axes
-    RETURNS
-        im : handle(?) : handle to image
-    '''
-    if plot_type == 'backaz':
-        yvar = output[:,3]
-        ax.set_ylabel("Backazimuth [$^o$]")
-        ax.set_ylim([0, 360])
-        ax.set_yticks(ticks=np.arange(0, 360+60, 60))
-    elif plot_type == 'slowness':
-        yvar = output[:,4]
-        ax.set_ylabel("Slowness [s/km]")
-        ax.set_yticks(ticks=np.arange(0, int(max(output[:,4]))+1, 1))
-    else:
-        raise Exception("Plot type not supported!")
-
-    im = ax.scatter(output[:,0], yvar, c=output[:,1],
-                    alpha=0.6, edgecolors='none', cmap='plasma',
-                    vmin=min(output[:,1]), vmax=max(output[:,1]))
-    cb = fig.colorbar(im, ax=ax)
-    cb.set_label("Semblance")
-    return im
-
 if __name__ == "__main__":
+
+
+    parser = argparse.ArgumentParser(
+        description="Run traditional beamforming on specified mseed data.")
+    parser.add_argument("-i", "--input",
+            dest="input_path",
+            type=str,
+            help="path to dir with correct structure blah blah")
+    args = parser.parse_args()
+
+    #print(args.input_path)
+
+
+    #main(args.input_path, True, False, True, dict(freqmin=0.5, freqmax=25))
+
+
 
     # run through different filters in parallel
     with ProcessPoolExecutor(max_workers=4) as pool:
         
         f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
-        args_list = [ [True, True, True, dict(freqmin=freqmin, freqmax=freqmax)] 
+        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
                      for freqmin in f_list for freqmax in f_list if freqmin<freqmax]
-        print(args_list)
 
         # now call main() with each set of args in parallel
         # map loops through each set of args
         result = pool.map(main, *zip(*args_list))
 
-   # filters = [dict(freqmin=0.5, freqmax=2.0),
-   #                     dict(freqmin=1.0, freqmax=5.0), 
-   #                     dict(freqmin=0.5, freqmax=10.0)]
-   # for filter_options in filters: 
-   #     main(process=True, 
-   #         trace_plot=True,
-   #         backaz_plot=True,
-   #         filter_options=filter_options)
-   # 
+
+    print("test")
+
