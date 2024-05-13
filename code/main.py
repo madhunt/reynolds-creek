@@ -1,16 +1,12 @@
 #!/usr/bin/python3
 
-import argparse
-
-import glob, obspy, os
+import plot_utils
+import argparse, glob, obspy, os
 import numpy as np
+import pandas as pd
 from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
-import pandas as pd
-
-from concurrent.futures import ProcessPoolExecutor
-
-import plot_utils
+#from concurrent.futures import ProcessPoolExecutor
 
 def main(path_home, process=False, trace_plot=False, backaz_plot=False,
          filter_options=None):
@@ -173,30 +169,27 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Run traditional beamforming on specified mseed data.")
+    parser.add_argument("-f", "--freqs",
+#TODO two inputs here
+            dest="freqmin",
+            type=str,
+            help="path to dir with correct structure blah blah")
     parser.add_argument("-i", "--input",
             dest="input_path",
             type=str,
             help="path to dir with correct structure blah blah")
     args = parser.parse_args()
 
-    #print(args.input_path)
-
-
     #main(args.input_path, True, False, True, dict(freqmin=0.5, freqmax=25))
 
+    ## run through different filters in parallel
+    #with ProcessPoolExecutor(max_workers=4) as pool:
+    #    
+    #    f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
+    #    args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
+    #                 for freqmin in f_list for freqmax in f_list if freqmin<freqmax]
 
-
-    # run through different filters in parallel
-    with ProcessPoolExecutor(max_workers=4) as pool:
-        
-        f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
-        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
-                     for freqmin in f_list for freqmax in f_list if freqmin<freqmax]
-
-        # now call main() with each set of args in parallel
-        # map loops through each set of args
-        result = pool.map(main, *zip(*args_list))
-
-
-    print("test")
+    #    # now call main() with each set of args in parallel
+    #    # map loops through each set of args
+    #    result = pool.map(main, *zip(*args_list))
 
