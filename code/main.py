@@ -189,7 +189,24 @@ if __name__ == "__main__":
     #    args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
     #                 for freqmin in f_list for freqmax in f_list if freqmin<freqmax]
 
+<<<<<<< Updated upstream
     #    # now call main() with each set of args in parallel
     #    # map loops through each set of args
     #    result = pool.map(main, *zip(*args_list))
+=======
+
+    # run through different filters in parallel
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        
+        f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
+        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
+                     for freqmin in f_list for freqmax in f_list if freqmin <= 2*freqmax]
+
+        # now call main() with each set of args in parallel
+        # map loops through each set of args
+        result = pool.map(main, *zip(*args_list))
+
+
+    print("test")
+>>>>>>> Stashed changes
 
