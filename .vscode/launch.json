@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-p", "-b", "-f", "0.5", "5", "-x", "TOP07"],
+            "args": ["-b", "-f", "0.5", "5", "-x", "TOP07"],
             //"args": ["-i", "/media/mad/LaCie 2 LT/research/reynolds-creek/TOP_10-07"],
             "env": {"PYDEVD_WARN_EVALUATION_TIMEOUT": "500"}
         }

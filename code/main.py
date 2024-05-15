@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import plot_utils
+import plot_utils, utils
 import argparse, glob, obspy, os
 import numpy as np
 import pandas as pd
@@ -15,13 +15,15 @@ def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
     path_data = os.path.join(path_home, "data")
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
     path_processed = os.path.join(path_data, "processed", 
-                    f"processed_output_{filt_freq_str}.npy")
+                    f"processed_output_{filt_freq_str}.pkl")
 
     # load data
     print("Loading and Filtering Data")
     #TODO option for highpass or lowpass only
-    data = load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
+    data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
                      filter_type='bandpass', **filter_options)
+    
+    #TODO REMOVE AND REORDER
     
     # plot individual traces
     if trace_plot == True:
@@ -36,7 +38,8 @@ def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
     else:
         # data has already been processed
         print("Loading Data")
-        output = np.load(path_processed)
+        output = pd.read_pickle(path_processed)
+        #output = np.load(path_processed)
     
     if backaz_plot == True:
         print("Plotting Backazimuth and Slowness")
@@ -45,76 +48,6 @@ def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
     return
 
 
-#TODO add option to specify a date range
-def load_data(path_data, gem_include=None, gem_exclude=None,
-              filter_type=None, **filter_options):
-    '''
-    Loads in and pre-processes array data.
-        Loads all miniseed files in a specified directory into an obspy stream. 
-        Assigns coordinates to all traces. If specified, filters data. If specified, 
-        only returns a subset of gems (otherwise, returns full array).
-    INPUTS
-        path_data : str : Path to data folder. Should contain all miniseed files 
-            under 'mseed' dir, and coordinates in .csv file(s).
-        gem_include : list of str : Optional. If specified, should list Gem station
-            names to include in processing. Mutually exclusive with gem_exclude.
-        gem_exclude : list of str : Optional. If specified, should list Gem station
-            names to include in processing. Mutually exclusive with gem_include.
-        filter_type : str : Optional. Obspy filter type. Includes 'bandpass', 
-            'highpass', and 'lowpass'.
-        filter_options : dict : Optional. Obspy filter arguments. For 'bandpass', 
-            contains freqmin and freqmax. For low/high pass, contains freq.
-    RETURNS
-        data : obspy stream : Stream of data traces for full array, or specified 
-            Gems. Stats include assigned coordinates.
-    '''
-    # paths to mseed and coordinates
-    path_mseed = os.path.join(path_data, "mseed", "*.mseed")
-    path_coords = glob.glob(os.path.join(path_data, "gps", "*.csv" ))#"20240114_Bonfire_Gems.csv")
-
-    # import data as obspy stream
-    data = obspy.read(path_mseed)
-
-    # import coordinates
-    coords = pd.DataFrame()
-    for file in path_coords:
-        coords = pd.concat([coords, pd.read_csv(file)])
-    coords["Name"] = coords["Name"].astype(str) # SN of gem
-    
-    # get rid of any stations that don't have coordinates
-    data_list = [trace for trace in data.traces 
-                    if trace.stats['station'] in coords["Station"].to_list()]
-    # convert list back to obspy stream
-    data = obspy.Stream(traces=data_list)
-
-    # assign coordinates to stations
-    for _, row in coords.iterrows():
-        sn = row["Station"]
-        for trace in data.select(station=sn):
-            trace.stats.coordinates = AttribDict({
-                'latitude': row["Latitude"],
-                'longitude': row["Longitude"],
-                'elevation': row["Elevation"] }) 
-    
-    if filter_type != None:
-        # filter data
-        data = data.filter(filter_type, **filter_options)
-
-    # merge dates (discard overlaps and leave gaps)
-    data = data.merge(method=0)
-    
-    # only use specified subset of gems
-    if gem_include != None:
-        data_subset = [trace for trace in data.traces if trace.stats['station'] in gem_include]
-        data_subset = obspy.Stream(traces=data_subset)
-        data = data_subset
-    elif gem_exclude != None:
-        data_subset = [trace for trace in data.traces if trace.stats['station'] not in gem_exclude]
-        data_subset = obspy.Stream(traces=data_subset)
-        data = data_subset
-
-    return data
-    
 def process_data(data, path_processed, time_start=None, time_end=None):
     '''
     Run obspy array_processing() function to beamform data. Save in .npy format to specified 
@@ -155,8 +88,13 @@ def process_data(data, path_processed, time_start=None, time_end=None):
     output[:,3] = [output[i][3] if output[i][3]>=0 else output[i][3]+360 
                     for i in range(output.shape[0])]
 
-    # save output to .npy file
-    np.save(path_processed, output)
+    # save output as dataframe
+    output = pd.DataFrame(data=output, 
+                          columns=["Time", "Semblance", "Abs Power", "Backaz", "Slowness"])
+
+    # save output to pickle
+    output.to_pickle(path_processed)
+    #np.save(path_processed, output)
     return output
 
 if __name__ == "__main__":
