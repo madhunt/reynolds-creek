@@ -53,8 +53,8 @@ def plot_backaz_slowness(output, path_home, filt_freq_str):
     
     #TODO have this as a func with user input slow min/max at some point
     # only plot backaz with slowness near 3 s/km
-    slow_min = 2.9
-    slow_max = 3.1
+    slow_min = 2.8
+    slow_max = 3.2
     output_constrain = []
     for col in output.T:
         col_constrain = [col[i] for i in range(len(col)) if slow_min < output[:,4][i] < slow_max]

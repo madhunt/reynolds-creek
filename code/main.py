@@ -8,44 +8,34 @@ from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
 #from concurrent.futures import ProcessPoolExecutor
 
-def main(path_home, process=False, trace_plot=False, backaz_plot=False,
-         filter_options=None):
+def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
+         filter_options=None, gem_include=None, gem_exclude=None):
 
 
-    print("entered main")
-
-    #FIXME path stuff
-    #path_curr = os.path.dirname(os.path.realpath(__file__))
-    #path_home = os.path.abspath(os.path.join(path_curr, '..'))
     path_data = os.path.join(path_home, "data")
-    
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
     path_processed = os.path.join(path_data, "processed", 
                     f"processed_output_{filt_freq_str}.npy")
 
-    #FIXME arguments into main or better
-    #gem_list = ['138', '170', '155', '136', '150']#, '133']  # hopefully back az towards south
-    gem_list=None
-    
-
-    filter_type = 'bandpass'
     # load data
     print("Loading and Filtering Data")
-    data = load_data(path_data, gem_list=gem_list, 
-                     filter_type=filter_type, **filter_options)
+    #TODO option for highpass or lowpass only
+    data = load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
+                     filter_type='bandpass', **filter_options)
     
     # plot individual traces
     if trace_plot == True:
         print("Plotting Traces")
+        #TODO fix this to allow many many traces
         plot_utils.plot_traces(data, path_home, filt_freq_str)
 
     if process == True:
-        print("Processing Data")
         # fiter and beamform 
+        print("Processing Data")
         output = process_data(data, path_processed, time_start=None, time_end=None)
     else:
-        print("Loading Data")
         # data has already been processed
+        print("Loading Data")
         output = np.load(path_processed)
     
     if backaz_plot == True:
@@ -56,7 +46,8 @@ def main(path_home, process=False, trace_plot=False, backaz_plot=False,
 
 
 #TODO add option to specify a date range
-def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
+def load_data(path_data, gem_include=None, gem_exclude=None,
+              filter_type=None, **filter_options):
     '''
     Loads in and pre-processes array data.
         Loads all miniseed files in a specified directory into an obspy stream. 
@@ -65,8 +56,10 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
     INPUTS
         path_data : str : Path to data folder. Should contain all miniseed files 
             under 'mseed' dir, and coordinates in .csv file(s).
-        gem_list : list of str : Optional. If specified, should list Gem SNs 
-            of interest. If `None`, will return full array.
+        gem_include : list of str : Optional. If specified, should list Gem station
+            names to include in processing. Mutually exclusive with gem_exclude.
+        gem_exclude : list of str : Optional. If specified, should list Gem station
+            names to include in processing. Mutually exclusive with gem_include.
         filter_type : str : Optional. Obspy filter type. Includes 'bandpass', 
             'highpass', and 'lowpass'.
         filter_options : dict : Optional. Obspy filter arguments. For 'bandpass', 
@@ -101,8 +94,7 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
             trace.stats.coordinates = AttribDict({
                 'latitude': row["Latitude"],
                 'longitude': row["Longitude"],
-                'elevation': row["Elevation"]
-            }) 
+                'elevation': row["Elevation"] }) 
     
     if filter_type != None:
         # filter data
@@ -111,14 +103,17 @@ def load_data(path_data, gem_list=None, filter_type=None, **filter_options):
     # merge dates (discard overlaps and leave gaps)
     data = data.merge(method=0)
     
-    if gem_list == None:
-        # use full array
-        return data
-    else:
-        # only use specified subset of gems
-        data_subset = [trace for trace in data.traces if trace.stats['station'] in gem_list]
+    # only use specified subset of gems
+    if gem_include != None:
+        data_subset = [trace for trace in data.traces if trace.stats['station'] in gem_include]
         data_subset = obspy.Stream(traces=data_subset)
-        return data_subset
+        data = data_subset
+    elif gem_exclude != None:
+        data_subset = [trace for trace in data.traces if trace.stats['station'] not in gem_exclude]
+        data_subset = obspy.Stream(traces=data_subset)
+        data = data_subset
+
+    return data
     
 def process_data(data, path_processed, time_start=None, time_end=None):
     '''
@@ -165,48 +160,81 @@ def process_data(data, path_processed, time_start=None, time_end=None):
     return output
 
 if __name__ == "__main__":
-
-
+    # parse arguments from command line
+    #NOTE: for VS Code, these are in launch.json file as "args"
     parser = argparse.ArgumentParser(
-        description="Run traditional beamforming on specified mseed data.")
+        description="Run traditional shift and stack beamforming on specified mseed data.")
+    
+    # path to this file
+    path_curr = os.path.dirname(os.path.realpath(__file__))
+    path_home = os.path.abspath(os.path.join(path_curr, '..'))
+    
+    #TODO allow user to specify input and output dirs if they dont have the correct structure
+    parser.add_argument("-d", "--dir",
+            dest="path_home",
+            type=str,
+            default=path_home,
+            help="Path to top-level directory containing data and figure sub-directories.")
+
+    parser.add_argument("-p", "--process",
+                        dest="process",
+                        default=False,
+                        action="store_true",
+                        help="Flag if data should be processed.")
+    parser.add_argument("-t", "--plot-trace",
+                        dest="trace_plot",
+                        default=False,
+                        action="store_true",
+                        help="Flag if trace plots should be created.")
+    parser.add_argument("-b", "--plot-backaz",
+                        dest="backaz_plot",
+                        default=False,
+                        action="store_true",
+                        help="Flag if backazimuth plots should be created.")
     parser.add_argument("-f", "--freqs",
-#TODO two inputs here
-            dest="freqmin",
+            nargs=2,
+            dest="freqs",
+            metavar=("freqmin", "freqmax"),
+            type=float,
+            help="Min and max frequencies for bandpass filter.")
+
+    group_gems = parser.add_mutually_exclusive_group(required=False)
+    group_gems.add_argument("-i", "--gem-include",
+            dest="gem_include",
             type=str,
-            help="path to dir with correct structure blah blah")
-    parser.add_argument("-i", "--input",
-            dest="input_path",
+            help="Gems to include in processing in comma-separated list (no spaces).")
+    group_gems.add_argument("-x", "--gem-exclude",
+            dest="gem_exclude",
             type=str,
-            help="path to dir with correct structure blah blah")
+            help="Gems to exclude in processing in comma-separated list (no spaces).")
+
     args = parser.parse_args()
+    
+    #TODO move this to utils
+    def arg_split_comma(arg):
+        if arg != None:
+            arg = [s for s in arg.split(",")]
+            return arg
+        else:
+            # return None
+            return arg
 
-    #main(args.input_path, True, False, True, dict(freqmin=0.5, freqmax=25))
-
-    ## run through different filters in parallel
-    #with ProcessPoolExecutor(max_workers=4) as pool:
-    #    
-    #    f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
-    #    args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
-    #                 for freqmin in f_list for freqmax in f_list if freqmin<freqmax]
-
-<<<<<<< Updated upstream
-    #    # now call main() with each set of args in parallel
-    #    # map loops through each set of args
-    #    result = pool.map(main, *zip(*args_list))
-=======
+    main(path_home=args.path_home, 
+         process=args.process, 
+         trace_plot=args.trace_plot,
+         backaz_plot=args.backaz_plot,
+         filter_options=dict(freqmin=args.freqs[0], 
+                             freqmax=args.freqs[1]),
+        gem_include=arg_split_comma(args.gem_include),
+        gem_exclude=arg_split_comma(args.gem_exclude))
 
     # run through different filters in parallel
-    with ProcessPoolExecutor(max_workers=4) as pool:
-        
-        f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
-        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
-                     for freqmin in f_list for freqmax in f_list if freqmin <= 2*freqmax]
+#    with ProcessPoolExecutor(max_workers=4) as pool:
+#        f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
+#        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
+#                     for freqmin in f_list for freqmax in f_list if freqmin <= 2*freqmax]
+#        # now call main() with each set of args in parallel
+#        # map loops through each set of args
+#        result = pool.map(main, *zip(*args_list))
 
-        # now call main() with each set of args in parallel
-        # map loops through each set of args
-        result = pool.map(main, *zip(*args_list))
-
-
-    print("test")
->>>>>>> Stashed changes
-
+    print("Completed Processing")
