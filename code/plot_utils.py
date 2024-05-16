@@ -30,8 +30,10 @@ def plot_traces(data, path_home, id_str):
     y_min = min(data.max()) # no data.min(), but max() includes most negative vals
 
     for n in np.arange(N, step=5):
-        fig, ax = plt.subplots(5, 1, sharex=True, sharey=True, tight_layout=True)
         curr_fig = int(np.ceil(n/5)+1)
+        print(f"    Plotting Figure {curr_fig} of {num_fig}")
+
+        fig, ax = plt.subplots(5, 1, sharex=True, sharey=True, tight_layout=True)
 
         for i in range(5):
             if n+i < len(data):

@@ -19,6 +19,7 @@ def main(path_home, filter_options=None, gem_list=None, shift_list=None):
     plot_utils.plot_traces(data_raw, path_home, "Raw Data")
 
     # (3) shift traces (if needed)
+    print("Shifting Traces")
     files_raw = glob.glob(os.path.join(path_raw, "*.mseed" ))
     path_mseed = os.path.join(path_home, "data", "mseed")
 
