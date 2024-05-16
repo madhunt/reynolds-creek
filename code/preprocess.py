@@ -8,22 +8,17 @@ from obspy.io.mseed.util import shift_time_of_file
 
 def main(path_home, filter_options=None, gem_list=None, shift_list=None):
 
-    # (1) load in raw (unfiltered) data
+    # (1) load in raw data
     print("Loading Raw Data")
     path_raw = os.path.join(path_home, "data", "raw")
     data_raw = utils.load_data(path_raw, gem_include=None, gem_exclude=None, 
                      filter_type=None, **filter_options)
 
-
-# (2) plot traces    
-    # plot individual traces
+    # (2) plot raw data
     print("Plotting Raw Data")
-   # #TODO fix this to allow many many traces
-   # filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
-   # plot_utils.plot_traces(data_raw, path_home, filt_freq_str)
+    plot_utils.plot_traces(data_raw, path_home, "Raw Data")
 
-
-    # (3) shift traces if needed
+    # (3) shift traces (if needed)
     files_raw = glob.glob(os.path.join(path_raw, "*.mseed" ))
     path_mseed = os.path.join(path_home, "data", "mseed")
 
@@ -40,18 +35,13 @@ def main(path_home, filter_options=None, gem_list=None, shift_list=None):
                 shift_time_of_file(input_file=src_path, 
                                    output_file=dst_path, 
                                    timeshift=shift_list[i])
+            #TODO MOVE OUT OF IF STATEMENT???
             else:
                 # move over the raw data
                 shutil.copy(src=src_path, dst=dst_path)
 
-# (4) replot traces
-
-
-# (5) save to mseed folder
-
-
-
-
+    # (4) replot traces
+    #filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
     return
 
 
@@ -85,8 +75,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
 
-    gem_list = [s.split(",")[0] for row in args.gem_shift for s in row]
-    shift_list = [float(s.split(",")[1]) for row in args.gem_shift for s in row]
+    #FIXME kinda ugly
+    if args.gem_shift != None:
+        gem_list = [s.split(",")[0] for row in args.gem_shift for s in row]
+        shift_list = [float(s.split(",")[1]) for row in args.gem_shift for s in row]
+    else:
+        gem_list = None
+        shift_list = None
 
     main(path_home=args.path_home, 
          filter_options=dict(freqmin=args.freqs[0], 

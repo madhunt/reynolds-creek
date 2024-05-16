@@ -5,46 +5,52 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 import matplotlib.dates as mdates
 import numpy as np
+import math
 
 
-def plot_traces(data, path_home, filt_freq_str):
+def plot_traces(data, path_home, id_str):
     '''
-    Plots individual traces from each Gem and saves at 
-    path_home/figures/traces_{freqmin}_{freqmax}.png.
+    Plots individual traces, with a max of 5 subplots per figure.
     INPUTS
-        data : obspy stream : merged stream with data from all Gems to plot
-        path_home : str : path to main dir. Figure will be saved in "figures" subdir.
-        filt_freq_str : str : string with data filter frequencies ("freqmin_freqmax")
+        data : obspy stream : Merged stream with data from all Gems to plot
+        path_home : str : Path to main dir. Figure will be saved in "figures" subdir.
+        id_str : str : Additional ID to put in figure title/filename. For instance, 
+            id_str = "Raw Data" will add "Raw Data" to the title and "raw_data" to 
+            the filename. 
     RETURNS
-        Saves figure at path_home/figures/traces.png
+        Saves figure at path_home/figures/
     '''
     # define number of traces
-    n = len(data)
-    #TODO make separate figures if plotting full array (if n > certain number)
-    fig, ax = plt.subplots(n, 1, sharex=True, sharey=True, tight_layout=True)
-    color = cm.rainbow(np.linspace(0, 1, n))
+    N = len(data)
+    num_fig = int(math.ceil(N/5))
+    color = cm.rainbow(np.linspace(0, 1, N))
 
-    for i, trace in enumerate(data):
-        ax[i].plot(trace.times("matplotlib"), trace.data, c=color[i])
-        ax[i].grid()
-        ax[i].set_ylabel(trace.stats["station"])
-        ax[i].xaxis_date()
+    # choose ylim values from min/max of all data
+    y_max = max(data.max())
+    y_min = min(data.max()) # no data.min(), but max() includes most negative vals
 
-        #TODO change this -- how to do this better?
-        ax[i].set_ylim([-100, 100])
+    for n in np.arange(N, step=5):
+        fig, ax = plt.subplots(5, 1, sharex=True, sharey=True, tight_layout=True)
+        curr_fig = int(np.ceil(n/5)+1)
 
-        #TODO make this better, ok for now
-        # plot fire start time
-        ax[i].axvline(datetime.datetime(2024, 1, 14, 22, 45), 
-                     color='k', linestyle='--', linewidth=2)
+        for i in range(5):
+            if n+i < len(data):
+                trace = data[n+i]
+                ax[i].plot(trace.times("matplotlib"), trace.data, c=color[n+i])
+                ax[i].set_ylabel(trace.stats["station"])
+                ax[i].grid()
+                ax[i].xaxis_date()
+                ax[i].set_ylim(y_min, y_max)
+            else:
+                fig.delaxes(ax[i])
+        # label and format bottom x-axis
+        ax[-1].set_xlabel("UTC Time")
+        fig.autofmt_xdate()
+        fig.suptitle(f"Individual Gem Traces for {id_str} ({curr_fig}/{num_fig})")
 
-    # label and format bottom x-axis
-    ax[n-1].set_xlabel("UTC Time")
-    fig.autofmt_xdate()
-    fig.suptitle(f"Individual Gem Traces (filtered {filt_freq_str})")
-
-    plt.savefig(os.path.join(path_home, "figures", f"traces_{filt_freq_str}.png"), dpi=500)
-    plt.close()
+        id_str_file = id_str.lower().replace(" ", "_")
+        plt.savefig(os.path.join(path_home, "figures", f"traces_{id_str_file}_{curr_fig}.png"), dpi=500)
+        plt.close()
     return
 
 

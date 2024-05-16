@@ -11,9 +11,10 @@
             "program": "${file}",
             "console": "integratedTerminal",
             // beamform.py args
-            "args": ["-p", "-b", "-f", "0.5", "10", "-x", "TOP07"],
+            //"args": ["-p", "-b", "-f", "0.5", "10", "-x", "TOP07"],
             // pre-process.py args
             //"args": ["-f", "0.5", "10", "-s", "TOP27,-2", "-s", "TOP43,-2"],
+            "args": ["-f", "0.5", "10"],
             "env": {"PYDEVD_WARN_EVALUATION_TIMEOUT": "500"}
         }
     ]
