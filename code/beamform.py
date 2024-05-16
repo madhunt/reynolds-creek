@@ -8,11 +8,11 @@ from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
 #from concurrent.futures import ProcessPoolExecutor
 
-def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
+def main(path_home, process=False, backaz_plot=False,
          filter_options=None, gem_include=None, gem_exclude=None):
 
 
-    path_data = os.path.join(path_home, "data")
+    path_data = os.path.join(path_home, "data", "mseed")
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
     path_processed = os.path.join(path_data, "processed", 
                     f"processed_output_{filt_freq_str}.pkl")
@@ -23,14 +23,6 @@ def main(path_home=None, process=False, trace_plot=False, backaz_plot=False,
     data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
                      filter_type='bandpass', **filter_options)
     
-    #TODO REMOVE AND REORDER
-    
-    # plot individual traces
-    if trace_plot == True:
-        print("Plotting Traces")
-        #TODO fix this to allow many many traces
-        plot_utils.plot_traces(data, path_home, filt_freq_str)
-
     if process == True:
         # fiter and beamform 
         print("Processing Data")
@@ -119,11 +111,6 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Flag if data should be processed.")
-    parser.add_argument("-t", "--plot-trace",
-                        dest="trace_plot",
-                        default=False,
-                        action="store_true",
-                        help="Flag if trace plots should be created.")
     parser.add_argument("-b", "--plot-backaz",
                         dest="backaz_plot",
                         default=False,
@@ -159,7 +146,6 @@ if __name__ == "__main__":
 
     main(path_home=args.path_home, 
          process=args.process, 
-         trace_plot=args.trace_plot,
          backaz_plot=args.backaz_plot,
          filter_options=dict(freqmin=args.freqs[0], 
                              freqmax=args.freqs[1]),

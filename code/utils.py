@@ -6,11 +6,6 @@ from obspy.core.util import AttribDict
 
 
 
-
-
-
-
-
 #TODO add option to specify a date range
 def load_data(path_data, gem_include=None, gem_exclude=None,
               filter_type=None, **filter_options):
@@ -35,8 +30,9 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
             Gems. Stats include assigned coordinates.
     '''
     # paths to mseed and coordinates
-    path_mseed = os.path.join(path_data, "mseed", "*.mseed")
-    path_coords = glob.glob(os.path.join(path_data, "gps", "*.csv" ))#"20240114_Bonfire_Gems.csv")
+    path_mseed = os.path.join(path_data, "*.mseed")
+    #TODO FIXME YIKES
+    path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" ))
 
     # import data as obspy stream
     data = obspy.read(path_mseed)
