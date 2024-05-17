@@ -2,6 +2,7 @@
 
 import glob, obspy, os
 import pandas as pd
+from datetime import datetime, timedelta
 from obspy.core.util import AttribDict
 
 
@@ -9,6 +10,7 @@ from obspy.core.util import AttribDict
 #TODO add option to specify a date range
 def load_data(path_data, gem_include=None, gem_exclude=None,
               filter_type=None, **filter_options):
+              #date_start=None, date_end=None,
     '''
     Loads in and pre-processes array data.
         Loads all miniseed files in a specified directory into an obspy stream. 
@@ -21,6 +23,9 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
             names to include in processing. Mutually exclusive with gem_exclude.
         gem_exclude : list of str : Optional. If specified, should list Gem station
             names to include in processing. Mutually exclusive with gem_include.
+        time_start : 
+        time_end : "YYYY-MM-DD" 
+
         filter_type : str : Optional. Obspy filter type. Includes 'bandpass', 
             'highpass', and 'lowpass'.
         filter_options : dict : Optional. Obspy filter arguments. For 'bandpass', 
@@ -33,6 +38,17 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
     path_mseed = os.path.join(path_data, "*.mseed")
     #TODO FIXME YIKES
     path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" ))
+
+    ## only use files in specified date range
+    #if date_start != None:
+    #    # remove all files before start date
+    #    start = datetime.strptime(date_start, "%Y-%m-%d")
+
+    #if date_end != None:
+
+    #    if date_end == date_start:
+    #    # remove all files after end date
+    #    date_end = datetime.strptime(date_end, "%Y-%m-%d")
 
     # import data as obspy stream
     data = obspy.read(path_mseed)
@@ -61,6 +77,8 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
     if filter_type != None:
         # filter data
         data = data.filter(filter_type, **filter_options)
+    #TODO
+    # median filter or interpolate??
 
     # merge dates (discard overlaps and leave gaps)
     data = data.merge(method=0)

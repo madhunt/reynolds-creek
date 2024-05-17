@@ -13,11 +13,11 @@
             // beamform.py args
             //"args": ["-p", "-b", "-f", "0.5", "10", "-x", "TOP07"],
             // beamform.py args PARALLEL
-            "args": ["-p", "-b", "-F", "0.5", "40"],
+            "args": ["-p", "-b", "-F", "0.5", "40", "-x", "TOP07"],
 
             // pre-process.py args
             //"args": ["-f", "0.5", "10", "-s", "TOP27,-2", "-s", "TOP43,-2"],
-            //"args": ["-f", "0.5", "10"],
+            //"args": ["-f", "0.5", "10", "-t1", "2023-10-07", "-t2", "2023-10-08"],
             "env": {"PYDEVD_WARN_EVALUATION_TIMEOUT": "500"}
         }
     ]

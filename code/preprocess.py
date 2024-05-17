@@ -6,13 +6,15 @@ import shutil
 from obspy.io.mseed.util import shift_time_of_file
 
 
-def main(path_home, filter_options=None, gem_list=None, shift_list=None):
+def main(path_home, filter_options=None, 
+         gem_list=None, shift_list=None, 
+         date_start=None, date_end=None):
 
     # (1) load in raw data
     print("Loading Raw Data")
     path_raw = os.path.join(path_home, "data", "raw")
     data_raw = utils.load_data(path_raw, gem_include=None, gem_exclude=None, 
-                     filter_type=None, **filter_options)
+                    filter_type=None, **filter_options)
 
     # (2) plot raw data
     print("Plotting Raw Data")
@@ -72,6 +74,21 @@ if __name__ == "__main__":
             action="append",
             nargs='+',
             help="-s TOP11,2 -s TOP44,2 -s TOP23,4")
+    
+
+    #TODO SHOULD t2 BE EXCLUSIVE? 
+    # specify just 2023-10-07 with t1=2023-10-07 and t2=2023-10-08
+    # OR with t1=2023-10-07 and t2=2023-10-07
+    #parser.add_argument("-t1", "--time-start",
+    #        dest="date_start",
+    #        type=str,
+    #        help=("Desired start date for data to be processed, in the form YYYY-MM-DD. \
+    #              If only one day should be processed, t1=t2."))
+    #parser.add_argument("-t2", "--time-end",
+    #        dest="date_end",
+    #        type=str,
+    #        help=("Desired end date for data to be processed, in the form YYYY-MM-DD. \
+    #              If only one day should be processed, t1=t2."))
 
     args = parser.parse_args()
     
@@ -87,4 +104,5 @@ if __name__ == "__main__":
     main(path_home=args.path_home, 
          filter_options=dict(freqmin=args.freqs[0], 
                              freqmax=args.freqs[1]),
+        #date_start=args.date_start, date_end=args.date_end,
         gem_list=gem_list, shift_list=shift_list)

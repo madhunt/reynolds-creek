@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import plot_utils, utils
-import argparse, math, os
+import argparse, math, os, datetime
 import numpy as np
 import pandas as pd
 from obspy.core.util import AttribDict
@@ -11,6 +11,7 @@ from concurrent.futures import ProcessPoolExecutor
 def main(path_home, process=False, backaz_plot=False,
          filter_options=None, gem_include=None, gem_exclude=None):
 
+    print("entered main")
 
     path_data = os.path.join(path_home, "data", "mseed")
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
@@ -18,14 +19,22 @@ def main(path_home, process=False, backaz_plot=False,
                     f"processed_output_{filt_freq_str}.pkl")
 
     # load data
-    print("Loading and Filtering Data")
+    print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})", file=f)
+    with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+        print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})", file=f)
+        print(path_data)
+
     #TODO option for highpass or lowpass only
     data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
                      filter_type='bandpass', **filter_options)
     
     if process == True:
         # fiter and beamform 
-        print("Processing Data")
+        print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})", file=f)
+        with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+            print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})", file=f)
+            print(path_processed)
+
         output = process_data(data, path_processed, time_start=None, time_end=None)
     else:
         # data has already been processed
@@ -33,7 +42,10 @@ def main(path_home, process=False, backaz_plot=False,
         #output = np.load(path_processed)
     
     if backaz_plot == True:
-        print("Plotting Backazimuth and Slowness")
+        print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
+        with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+            print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
+
         plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
     
     return
@@ -61,7 +73,7 @@ def process_data(data, path_processed, time_start=None, time_end=None):
     if time_end == None:
         time_end = min([trace.stats.endtime for trace in data])
 
-    #FIXME probably can clean this up when these change
+    #FIXME can clean this up when these change
     process_kwargs = dict(
         # slowness grid (in [s/km])
         sll_x=-4.0, slm_x=4.0, sll_y=-4.0, slm_y=4.0, sl_s=0.1,
@@ -85,7 +97,6 @@ def process_data(data, path_processed, time_start=None, time_end=None):
 
     # save output to pickle
     output.to_pickle(path_processed)
-    #np.save(path_processed, output)
     return output
 
 if __name__ == "__main__":
@@ -110,6 +121,7 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Flag if data should be processed.")
+    #FIXME dont really need this as an arg bc i will always want to plot
     parser.add_argument("-b", "--plot-backaz",
                         dest="backaz_plot",
                         default=False,
