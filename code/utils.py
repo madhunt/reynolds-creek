@@ -76,4 +76,14 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
         data = data_subset
 
     return data
+
+
+
+def arg_split_comma(arg):
+    if arg != None:
+        arg = [s for s in arg.split(",")]
+        return arg
+    else:
+        # return None
+        return arg
     

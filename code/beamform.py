@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
 import plot_utils, utils
-import argparse, glob, obspy, os
+import argparse, math, os
 import numpy as np
 import pandas as pd
 from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
-#from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 def main(path_home, process=False, backaz_plot=False,
          filter_options=None, gem_include=None, gem_exclude=None):
@@ -29,7 +29,6 @@ def main(path_home, process=False, backaz_plot=False,
         output = process_data(data, path_processed, time_start=None, time_end=None)
     else:
         # data has already been processed
-        print("Loading Data")
         output = pd.read_pickle(path_processed)
         #output = np.load(path_processed)
     
@@ -116,12 +115,20 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Flag if backazimuth plots should be created.")
-    parser.add_argument("-f", "--freqs",
+    
+    freqs = parser.add_mutually_exclusive_group(required=True)
+    freqs.add_argument("-f", "--freq",
             nargs=2,
-            dest="freqs",
+            dest="freq_bp",
             metavar=("freqmin", "freqmax"),
             type=float,
-            help="Min and max frequencies for bandpass filter.")
+            help="Min and max frequencies for a single bandpass filter.")
+    freqs.add_argument("-F", "--freq-range",
+            nargs=2,
+            dest="freq_range",
+            metavar=("freqmin", "freqmax"),
+            type=float,
+            help="Min and max for a range of frequencies to run multiple bandpass filters in parallel.")
 
     group_gems = parser.add_mutually_exclusive_group(required=False)
     group_gems.add_argument("-i", "--gem-include",
@@ -135,30 +142,36 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
-    #TODO move this to utils
-    def arg_split_comma(arg):
-        if arg != None:
-            arg = [s for s in arg.split(",")]
-            return arg
-        else:
-            # return None
-            return arg
 
-    main(path_home=args.path_home, 
-         process=args.process, 
-         backaz_plot=args.backaz_plot,
-         filter_options=dict(freqmin=args.freqs[0], 
-                             freqmax=args.freqs[1]),
-        gem_include=arg_split_comma(args.gem_include),
-        gem_exclude=arg_split_comma(args.gem_exclude))
+    if args.freq_bp != None:
+        main(path_home=args.path_home, 
+            process=args.process, 
+            backaz_plot=args.backaz_plot,
+            filter_options=dict(freqmin=args.freq_bp[0], 
+                                freqmax=args.freq_bp[1]),
+            gem_include=utils.arg_split_comma(args.gem_include),
+            gem_exclude=utils.arg_split_comma(args.gem_exclude))
+    elif args.freq_range != None:
+        # multiple frequencies specified
 
-    # run through different filters in parallel
-#    with ProcessPoolExecutor(max_workers=4) as pool:
-#        f_list = [0.5, 1, 2, 4, 8, 10, 15, 20, 25, 30, 35, 40]
-#        args_list = [ [args.input_path, True, False, True, dict(freqmin=freqmin, freqmax=freqmax)] 
-#                     for freqmin in f_list for freqmax in f_list if freqmin <= 2*freqmax]
-#        # now call main() with each set of args in parallel
-#        # map loops through each set of args
-#        result = pool.map(main, *zip(*args_list))
+        #TODO what if you don't want octaves??
+        pwr_min = math.log(args.freq_range[0], 2)
+        pwr_max = math.log(args.freq_range[1], 2)
+        freq_list = 2** np.arange(pwr_min, pwr_max, 1)
+
+        #NOTE for Borah (48 cores per node)
+        with ProcessPoolExecutor(max_workers=48) as pool:
+
+            args_list = [[args.path_home, 
+                        args.process, 
+                        args.backaz_plot,
+                        dict(freqmin=freqmin, 
+                            freqmax=freqmax),
+                        utils.arg_split_comma(args.gem_include),
+                        utils.arg_split_comma(args.gem_exclude)]
+                        for freqmin in freq_list for freqmax in freq_list if freqmin < freqmax]
+
+            # run through different filters in parallel
+            result = pool.map(main, *zip(*args_list))
 
     print("Completed Processing")

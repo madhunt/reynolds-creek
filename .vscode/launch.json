@@ -12,9 +12,12 @@
             "console": "integratedTerminal",
             // beamform.py args
             //"args": ["-p", "-b", "-f", "0.5", "10", "-x", "TOP07"],
+            // beamform.py args PARALLEL
+            "args": ["-p", "-b", "-F", "0.5", "40"],
+
             // pre-process.py args
             //"args": ["-f", "0.5", "10", "-s", "TOP27,-2", "-s", "TOP43,-2"],
-            "args": ["-f", "0.5", "10"],
+            //"args": ["-f", "0.5", "10"],
             "env": {"PYDEVD_WARN_EVALUATION_TIMEOUT": "500"}
         }
     ]
