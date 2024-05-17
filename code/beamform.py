@@ -15,14 +15,14 @@ def main(path_home, process=False, backaz_plot=False,
 
     path_data = os.path.join(path_home, "data", "mseed")
     filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
-    path_processed = os.path.join(path_data, "processed", 
+    path_processed = os.path.join(path_home, "data", "processed", 
                     f"processed_output_{filt_freq_str}.pkl")
 
     # load data
-    print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})", file=f)
-    with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+    print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})")
+    with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
         print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})", file=f)
-        print(path_data)
+        print(path_data, file=f)
 
     #TODO option for highpass or lowpass only
     data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
@@ -30,10 +30,10 @@ def main(path_home, process=False, backaz_plot=False,
     
     if process == True:
         # fiter and beamform 
-        print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})", file=f)
-        with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+        print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})")
+        with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
             print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})", file=f)
-            print(path_processed)
+            print(path_processed, file=f)
 
         output = process_data(data, path_processed, time_start=None, time_end=None)
     else:
@@ -42,8 +42,8 @@ def main(path_home, process=False, backaz_plot=False,
         #output = np.load(path_processed)
     
     if backaz_plot == True:
-        print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
-        with open(os.path.join(path_home, "code", "log", "pylog.txt")) as f:
+        print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})")
+        with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
             print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
 
         plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
