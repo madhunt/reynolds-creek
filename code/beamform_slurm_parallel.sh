@@ -18,7 +18,7 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 
 . ~/.bashrc
 mamba activate array
-python ./beamform.py -p -b -F 0.5 40 -x TOP07
+python -u code/beamform.py -p -b -F 0.5 40 -x TOP07
 
 echo "Date 2                  = $(date)"
 

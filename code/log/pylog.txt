@@ -1,0 +1,105 @@
+2024-05-17 17:59:13.088066 		 Loading and Filtering Data (0.5_1.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.089492 		 Loading and Filtering Data (0.5_2.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.089505 		 Loading and Filtering Data (0.5_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.089505 		 Loading and Filtering Data (0.5_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.089508 		 Loading and Filtering Data (0.5_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.089610 		 Loading and Filtering Data (0.5_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.091199 		 Loading and Filtering Data (1.0_2.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.091216 		 Loading and Filtering Data (1.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.091250 		 Loading and Filtering Data (1.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.091196 		 Loading and Filtering Data (1.0_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.092750 		 Loading and Filtering Data (2.0_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.092760 		 Loading and Filtering Data (1.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.092757 		 Loading and Filtering Data (2.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.092799 		 Loading and Filtering Data (2.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.093772 		 Loading and Filtering Data (2.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.093781 		 Loading and Filtering Data (4.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.093827 		 Loading and Filtering Data (4.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.095741 		 Loading and Filtering Data (4.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.095748 		 Loading and Filtering Data (8.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.095759 		 Loading and Filtering Data (8.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:13.095766 		 Loading and Filtering Data (16.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-05-17 17:59:24.219046 		 Processing Data (4.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_4.0_32.0.pkl
+2024-05-17 17:59:24.495885 		 Processing Data (1.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_1.0_32.0.pkl
+2024-05-17 17:59:24.551856 		 Processing Data (0.5_2.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_2.0.pkl
+2024-05-17 17:59:24.631914 		 Processing Data (2.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2.0_16.0.pkl
+2024-05-17 17:59:24.680347 		 Processing Data (2.0_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2.0_4.0.pkl
+2024-05-17 17:59:24.716420 		 Processing Data (0.5_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_16.0.pkl
+2024-05-17 17:59:24.759584 		 Processing Data (1.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_1.0_16.0.pkl
+2024-05-17 17:59:24.762209 		 Processing Data (4.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_4.0_8.0.pkl
+2024-05-17 17:59:24.786663 		 Processing Data (0.5_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_32.0.pkl
+2024-05-17 17:59:24.795996 		 Processing Data (0.5_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_8.0.pkl
+2024-05-17 17:59:24.797896 		 Processing Data (1.0_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_1.0_4.0.pkl
+2024-05-17 17:59:24.807268 		 Processing Data (16.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_16.0_32.0.pkl
+2024-05-17 17:59:24.843317 		 Processing Data (2.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2.0_8.0.pkl
+2024-05-17 17:59:24.878432 		 Processing Data (0.5_1.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_1.0.pkl
+2024-05-17 17:59:24.879385 		 Processing Data (1.0_8.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_1.0_8.0.pkl
+2024-05-17 17:59:24.913469 		 Processing Data (8.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_8.0_32.0.pkl
+2024-05-17 17:59:24.944422 		 Processing Data (0.5_4.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_0.5_4.0.pkl
+2024-05-17 17:59:24.968353 		 Processing Data (4.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_4.0_16.0.pkl
+2024-05-17 17:59:24.978562 		 Processing Data (2.0_32.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2.0_32.0.pkl
+2024-05-17 17:59:25.129182 		 Processing Data (1.0_2.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_1.0_2.0.pkl
+2024-05-17 17:59:25.140997 		 Processing Data (8.0_16.0)
+/bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_8.0_16.0.pkl
+2024-05-18 02:03:16.811408 		 Plotting Backazimuth (0.5_1.0)
+2024-05-18 02:03:25.384106 		 Plotting Backazimuth (2.0_32.0)
+2024-05-18 02:03:27.962069 		 Plotting Backazimuth (1.0_4.0)
+2024-05-18 02:03:29.543578 		 Plotting Backazimuth (16.0_32.0)
+2024-05-18 02:03:32.284377 		 Plotting Backazimuth (8.0_32.0)
+2024-05-18 02:03:33.503903 		 Plotting Backazimuth (1.0_16.0)
+2024-05-18 02:03:33.645806 		 Plotting Backazimuth (1.0_2.0)
+2024-05-18 02:03:37.469955 		 Plotting Backazimuth (4.0_16.0)
+2024-05-18 02:03:37.843346 		 Plotting Backazimuth (0.5_4.0)
+2024-05-18 02:03:42.278248 		 Plotting Backazimuth (0.5_2.0)
+2024-05-18 02:03:47.745261 		 Plotting Backazimuth (2.0_16.0)
+2024-05-18 02:03:49.512048 		 Plotting Backazimuth (0.5_32.0)
+2024-05-18 02:03:49.658256 		 Plotting Backazimuth (2.0_8.0)
+2024-05-18 02:03:52.131018 		 Plotting Backazimuth (2.0_4.0)
+2024-05-18 02:04:03.475548 		 Plotting Backazimuth (1.0_32.0)
+2024-05-18 02:04:16.572324 		 Plotting Backazimuth (4.0_8.0)
+2024-05-18 02:04:21.483401 		 Plotting Backazimuth (0.5_16.0)
+2024-05-18 02:04:25.081556 		 Plotting Backazimuth (4.0_32.0)
+2024-05-18 02:04:26.349691 		 Plotting Backazimuth (8.0_16.0)
+2024-05-18 02:04:41.400083 		 Plotting Backazimuth (0.5_8.0)
+2024-05-18 02:05:18.489615 		 Plotting Backazimuth (1.0_8.0)
