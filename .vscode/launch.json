@@ -10,10 +10,13 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            // beamform.py args
-            //"args": ["-p", "-b", "-f", "0.5", "10", "-x", "TOP07"],
+            // beamform.py args one bandpass
+            "args": ["-p", "-b", "-f", "0.5", "2", "-x", "TOP07"],
             // beamform.py args PARALLEL
-            "args": ["-p", "-b", "-F", "0.5", "2", "-x", "TOP07"],
+            //"args": ["-p", "-b", "-F", "0.5", "2", "-x", "TOP07"],
+
+            // testing plotting
+            //"args": ["-b", "-F", "0.5", "2", "-x", "TOP07"],
 
             // pre-process.py args
             //"args": ["-f", "0.5", "10", "-s", "TOP27,-2", "-s", "TOP43,-2"],
