@@ -45,14 +45,11 @@ def main(path_home, process=False, backaz_plot=False,
             print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
 
         # plot backaz/slowness time series
-        #FIXME
-        #FIXME
-        #FIXME
-        # uncomment
-        ##plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
+        plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
 
         # plot slowness space
-        plot_utils.plot_slowness(output, path_home, id_str=filt_freq_str)
+        #FIXME currently not working as intended
+        #plot_utils.plot_slowness(output, path_home, id_str=filt_freq_str)
     
     return
 
