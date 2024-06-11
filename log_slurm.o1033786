@@ -1,0 +1,91 @@
+Date                  = Fri May 17 17:58:47 MDT 2024
+Hostname              = cpu120
+PWD                   = /bsuhome/madelinehunt/reynolds-creek
+Num Nodes Allocated   = 1
+Num Tasks Allocated   = 1
+entered main
+entered main
+2024-05-17 17:59:13.086791 		 Loading and Filtering Data (0.5_1.0)
+entered main
+2024-05-17 17:59:13.086814 		 Loading and Filtering Data (0.5_2.0)
+entered main
+2024-05-17 17:59:13.086952 		 Loading and Filtering Data (0.5_4.0)
+entered main2024-05-17 17:59:13.087030 		 Loading and Filtering Data (0.5_8.0)
+
+2024-05-17 17:59:13.087188 		 Loading and Filtering Data (0.5_16.0)
+entered main
+entered main
+2024-05-17 17:59:13.087340 		 Loading and Filtering Data (0.5_32.0)
+2024-05-17 17:59:13.087442 		 Loading and Filtering Data (1.0_2.0)
+entered main
+2024-05-17 17:59:13.087605 		 Loading and Filtering Data (1.0_4.0)entered main
+
+entered main
+2024-05-17 17:59:13.087736 		 Loading and Filtering Data (1.0_16.0)
+2024-05-17 17:59:13.087828 		 Loading and Filtering Data (1.0_32.0)
+entered main
+entered main
+entered main
+2024-05-17 17:59:13.087972 		 Loading and Filtering Data (2.0_4.0)
+entered main
+2024-05-17 17:59:13.088064 		 Loading and Filtering Data (2.0_8.0)
+entered main
+2024-05-17 17:59:13.088112 		 Loading and Filtering Data (1.0_8.0)
+2024-05-17 17:59:13.088179 		 Loading and Filtering Data (2.0_16.0)
+entered main
+2024-05-17 17:59:13.088250 		 Loading and Filtering Data (2.0_32.0)
+2024-05-17 17:59:13.088345 		 Loading and Filtering Data (4.0_8.0)
+entered main
+entered main
+2024-05-17 17:59:13.088547 		 Loading and Filtering Data (4.0_16.0)
+entered main
+2024-05-17 17:59:13.088630 		 Loading and Filtering Data (4.0_32.0)
+entered main
+2024-05-17 17:59:13.088711 		 Loading and Filtering Data (8.0_16.0)
+entered main
+2024-05-17 17:59:13.088801 		 Loading and Filtering Data (8.0_32.0)
+2024-05-17 17:59:13.088888 		 Loading and Filtering Data (16.0_32.0)
+2024-05-17 17:59:24.217548 		 Processing Data (4.0_32.0)
+2024-05-17 17:59:24.494464 		 Processing Data (1.0_32.0)
+2024-05-17 17:59:24.551399 		 Processing Data (0.5_2.0)
+2024-05-17 17:59:24.631469 		 Processing Data (2.0_16.0)
+2024-05-17 17:59:24.679847 		 Processing Data (2.0_4.0)
+2024-05-17 17:59:24.716014 		 Processing Data (0.5_16.0)
+2024-05-17 17:59:24.759157 		 Processing Data (1.0_16.0)
+2024-05-17 17:59:24.761537 		 Processing Data (4.0_8.0)
+2024-05-17 17:59:24.786040 		 Processing Data (0.5_32.0)
+2024-05-17 17:59:24.795435 		 Processing Data (0.5_8.0)
+2024-05-17 17:59:24.797547 		 Processing Data (1.0_4.0)
+2024-05-17 17:59:24.806581 		 Processing Data (16.0_32.0)
+2024-05-17 17:59:24.842856 		 Processing Data (2.0_8.0)
+2024-05-17 17:59:24.877909 		 Processing Data (0.5_1.0)
+2024-05-17 17:59:24.878845 		 Processing Data (1.0_8.0)
+2024-05-17 17:59:24.912607 		 Processing Data (8.0_32.0)
+2024-05-17 17:59:24.943872 		 Processing Data (0.5_4.0)
+2024-05-17 17:59:24.967703 		 Processing Data (4.0_16.0)
+2024-05-17 17:59:24.978102 		 Processing Data (2.0_32.0)
+2024-05-17 17:59:25.128689 		 Processing Data (1.0_2.0)
+2024-05-17 17:59:25.140462 		 Processing Data (8.0_16.0)
+2024-05-18 02:03:16.807238 		 Plotting Backazimuth (0.5_1.0)
+2024-05-18 02:03:25.383593 		 Plotting Backazimuth (2.0_32.0)
+2024-05-18 02:03:27.961835 		 Plotting Backazimuth (1.0_4.0)
+2024-05-18 02:03:29.543198 		 Plotting Backazimuth (16.0_32.0)
+2024-05-18 02:03:32.284067 		 Plotting Backazimuth (8.0_32.0)
+2024-05-18 02:03:33.503478 		 Plotting Backazimuth (1.0_16.0)
+2024-05-18 02:03:33.645193 		 Plotting Backazimuth (1.0_2.0)
+2024-05-18 02:03:37.469717 		 Plotting Backazimuth (4.0_16.0)
+2024-05-18 02:03:37.842917 		 Plotting Backazimuth (0.5_4.0)
+2024-05-18 02:03:42.277795 		 Plotting Backazimuth (0.5_2.0)
+2024-05-18 02:03:47.744860 		 Plotting Backazimuth (2.0_16.0)
+2024-05-18 02:03:49.511730 		 Plotting Backazimuth (0.5_32.0)
+2024-05-18 02:03:49.657913 		 Plotting Backazimuth (2.0_8.0)
+2024-05-18 02:03:52.130618 		 Plotting Backazimuth (2.0_4.0)
+2024-05-18 02:04:03.475145 		 Plotting Backazimuth (1.0_32.0)
+2024-05-18 02:04:16.571833 		 Plotting Backazimuth (4.0_8.0)
+2024-05-18 02:04:21.482764 		 Plotting Backazimuth (0.5_16.0)
+2024-05-18 02:04:25.081125 		 Plotting Backazimuth (4.0_32.0)
+2024-05-18 02:04:26.349455 		 Plotting Backazimuth (8.0_16.0)
+2024-05-18 02:04:41.399554 		 Plotting Backazimuth (0.5_8.0)
+2024-05-18 02:05:18.489118 		 Plotting Backazimuth (1.0_8.0)
+Completed Processing
+Date 2                  = Sat May 18 02:05:21 MDT 2024
