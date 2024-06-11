@@ -6,6 +6,7 @@ from matplotlib.pyplot import cm
 import matplotlib.dates as mdates
 import numpy as np
 import math
+import scipy as sci
 
 
 def plot_traces(data, path_home, id_str):
@@ -56,6 +57,56 @@ def plot_traces(data, path_home, id_str):
     return
 
 
+#TODO get coords and plot stations
+# do this in pre-processing
+def plot_station_map():
+
+    return
+
+
+def plot_slowness(output, path_home, id_str):
+    '''
+    Creates slowness-space plot for output from beamforming. 
+    INPUTS
+        output : pandas dataframe : Result from beamforming processing. Contains timestamp,
+            semblance, abs power, backazimuth (0-360), and slowness (s/km).
+        path_home : str : Path to main dir. Figure will be saved in "figures" subdir.
+        id_str : str : Additional ID to put in figure title/filename. For instance, 
+            id_str = "0.5_4.0" will 
+    RETURNS
+        Saves figure at path_home/figures/
+    '''
+    #FIXME
+    #FIXME
+    #FIXME
+    #FIXME this does not work currently. need to think about what I actually want here
+    # filter by time so not all points are plotted 
+    slist = np.arange(-4, 4, 0.1)
+    lim = slist.max()
+    
+    theta = np.deg2rad( (-1*output['Backaz'].to_numpy() + 90)%360 )
+    r = output['Slowness'].to_numpy()
+    z = output['Semblance'].to_numpy()
+
+    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': 'polar'})
+    for i in range(100): 
+        ax.scatter(theta[i], r[i], color=plt.cm.plasma(z[i]))
+    plt.show()
+
+    plt.xlabel('$s_x$ (s/km)')
+    plt.ylabel('$s_y$ (s/km)')
+    plt.title("Slowness Spectrum")
+
+    plt.show()
+
+    #id_str_file = id_str.lower().replace(" ", "_")
+    #plt.savefig(os.path.join(path_home, "figures", f"slowness_{id_str_file}.png"), dpi=500)
+    #plt.close()
+    return
+
+
+
+#TODO update filt_freq_str to ID str
 def plot_backaz_slowness(output, path_home, filt_freq_str):
     #TODO make this able to reuse for other data #FIXME
     
