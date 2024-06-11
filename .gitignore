@@ -2,3 +2,5 @@ code/__pycache__
 data/raw
 data/mseed
 data/fieldnotes
+figures/
+data/processed/
