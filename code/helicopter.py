@@ -31,7 +31,7 @@ def main(path_home):
     output = pd.read_pickle(path_processed)
 
     # plot processed data
-    fig, ax = plot_backaz(output=output, path_home=path_home, 
+    fig, ax = plot_utils.plot_backaz(output=output, path_home=path_home, 
                           subtitle_str=f"Filtered {freqmin} to {freqmax} Hz", file_str=None)
     
     # plot heli data
@@ -53,63 +53,6 @@ def main(path_home):
     
     
     return
-
-def plot_backaz(output, path_home, subtitle_str, file_str=None):
-    '''
-    Plot backazimuth over time from output of array processing. 
-    INPUTS:
-        output : pandas df : Result from beamforming with the columns 
-            Time (datetime), Semblance, Abs Power, Backaz (0-360), and Slowness.
-        path_home : str : Path to main dir. Figure will be saved in "figures" subdir.
-        subtitle_str : str : Subtitle for plot. Usually contains bandpass frequencies 
-            (e.g. "Filtered 24-32 Hz")
-        file_str : str or None : String to append on end of filename to uniquely save figure 
-            (e.g. "24.0_32.0"). If None, function returns a handle to the figure and axes, and does 
-            NOT save the figure. 
-    RETURNS:
-        If file_str=None, returns handle to the figure and axes. Figure is NOT saved.
-        Otherwise, figure is saved as path_home/figures/backaz_{file_str}.png
-    '''
-    # sort by ascending semblance so brightest points are plotted on top
-    output = output.sort_values(by="Semblance", ascending=True)
-
-    # constrain data to only plot points with slownesses near 3 s/km
-    slow_min = 2.5
-    slow_max = 3.5
-    output = output[output["Slowness"].between(slow_min, slow_max)]
-
-    # create figure
-    fig, ax = plt.subplots(1, 1, figsize=[7, 5], tight_layout=True)
-    im = ax.scatter(output["Time"], output['Backaz'], c=output["Semblance"],
-                    alpha=0.7, edgecolors='none', cmap='plasma',
-                    vmin=min(output["Semblance"]), vmax=max(output["Semblance"]))
-    cb = fig.colorbar(im, ax=ax)
-    cb.set_label("Semblance")
-
-    # format y-axis
-    ax.set_ylabel("Backazimuth [$^o$]")
-    ax.set_ylim([0, 360])
-    ax.set_yticks(ticks=np.arange(0, 360+60, 60))
-
-    # format x-axis
-    ax.set_xlabel("Mountain Time (Local)")
-    ax.set_xlim([output["Time"].min(), output["Time"].max()])
-    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=2))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
-    fig.autofmt_xdate()
-
-    # add titles
-    fig.suptitle(f"Backazimuth")
-    ax.set_title(subtitle_str, fontsize=10)
-
-    if file_str == None:
-        return fig, ax
-    else: 
-        # save figure
-        plt.savefig(os.path.join(path_home, "figures", f"backaz_{file_str}.png"), dpi=500)
-        plt.close()
-        return
-
 
 def adsb_kml_to_df(path):
     '''

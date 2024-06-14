@@ -7,12 +7,15 @@ import pandas as pd
 from obspy.core.util import AttribDict
 from obspy.signal.array_analysis import array_processing
 from concurrent.futures import ProcessPoolExecutor
+from matplotlib.dates import num2date
 
 def main(path_home, process=False, backaz_plot=False,
          filter_options=None, gem_include=None, gem_exclude=None):
 
     path_data = os.path.join(path_home, "data", "mseed")
-    filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
+    freqmin = filter_options['freqmin']
+    freqmax = filter_options['freqmax']
+    filt_freq_str = f"{freqmin}_{freqmax}"
     path_processed = os.path.join(path_home, "data", "processed", 
                     f"processed_output_{filt_freq_str}.pkl")
 
@@ -44,8 +47,9 @@ def main(path_home, process=False, backaz_plot=False,
         with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
             print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
 
-        # plot backaz/slowness time series
-        plot_utils.plot_backaz_slowness(output, path_home, filt_freq_str)
+        # plot backaz time series
+        plot_utils.plot_backaz(output, path_home, 
+                               f"Filtered {freqmin} to {freqmax} Hz", filt_freq_str)
 
         # plot slowness space
         #FIXME currently not working as intended
@@ -100,6 +104,9 @@ def process_data(data, path_processed, time_start=None, time_end=None, filter_op
     # save output as dataframe
     output = pd.DataFrame(data=output, 
                           columns=["Time", "Semblance", "Abs Power", "Backaz", "Slowness"])
+    
+    # save time steps as datetime types
+    output["Time"] = num2date(output["Time"])
 
     # save output to pickle
     output.to_pickle(path_processed)

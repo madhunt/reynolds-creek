@@ -81,23 +81,33 @@ def plot_slowness(output, path_home, id_str):
     #FIXME
     #FIXME this does not work currently. need to think about what I actually want here
     # filter by time so not all points are plotted 
+    
+    # only filter out points with slowness close to 3 s/km
+    slow_min = 2.9
+    slow_max = 3.1
+    output = output[output["Slowness"].between(slow_min, slow_max)]
+
     slist = np.arange(-4, 4, 0.1)
     lim = slist.max()
     
     theta = np.deg2rad( (-1*output['Backaz'].to_numpy() + 90)%360 )
     r = output['Slowness'].to_numpy()
     z = output['Semblance'].to_numpy()
+    
+
+    # define colors
+    N = 100#len(output)
+    color = plt.cm.rainbow(np.linspace(0, 1, N))
 
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': 'polar'})
     for i in range(100): 
-        ax.scatter(theta[i], r[i], color=plt.cm.plasma(z[i]))
-    plt.show()
+        ax.scatter(theta[i], r[i], color=color[i])
 
     plt.xlabel('$s_x$ (s/km)')
     plt.ylabel('$s_y$ (s/km)')
     plt.title("Slowness Spectrum")
-
     plt.show()
+
 
     #id_str_file = id_str.lower().replace(" ", "_")
     #plt.savefig(os.path.join(path_home, "figures", f"slowness_{id_str_file}.png"), dpi=500)
@@ -105,67 +115,60 @@ def plot_slowness(output, path_home, id_str):
     return
 
 
-
-#TODO update filt_freq_str to ID str
-def plot_backaz_slowness(output, path_home, filt_freq_str):
-    #TODO make this able to reuse for other data #FIXME
-    
-    #TODO have this as a func with user input slow min/max at some point
-    # only plot backaz with slowness near 3 s/km
-    slow_min = 2.9
-    slow_max = 3.1
-    output_constrain = output[output["Slowness"].between(slow_min, slow_max)]
-
-    fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True)
-    im0 = simple_beamform_plot('backaz', output_constrain, fig, ax[0])
-    im1 = simple_beamform_plot('slowness', output, fig, ax[1])
-
-    for ax_i in ax:
-        ax_i.xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=2))
-        ax_i.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M"))
-        
-    ax[1].set_xlabel("UTC Time")
-    fig.autofmt_xdate()
-    fig.suptitle(f"Backazimuth and Slowness (filtered {filt_freq_str})")
-
-    plt.savefig(os.path.join(path_home, "figures", f"backaz_slowness_{filt_freq_str}.png"), dpi=500)
-    plt.close()
-    return
-
-
-#TODO think about this... there's probably a neater way to consolidate and reuse this func
-# will leave for now and wait for other plotting needs
-def simple_beamform_plot(plot_type, output, fig, ax):
+def plot_backaz(output, path_home, subtitle_str, file_str=None):
     '''
-    Plots beackazimuth or slowness on given figure, along with colorbar. Assumes output array 
-    includes columns in the same order as output of array_processing().
-    INPUTS
-        plot_type : str : 'backaz' or 'slowness'
-        output : np array : array with 5 rows containing output of array_processing() function. 
-            This includes time, semblance, abs power, backazimuth, and slowness.
-        fig, ax : pyplot handles(?) : handles(?) to figure and axes
-    RETURNS
-        im : handle(?) : handle to image
+    Plot backazimuth over time from output of array processing. 
+    INPUTS:
+        output : pandas df : Result from beamforming with the columns 
+            Time (datetime), Semblance, Abs Power, Backaz (0-360), and Slowness.
+        path_home : str : Path to main dir. Figure will be saved in "figures" subdir.
+        subtitle_str : str : Subtitle for plot. Usually contains bandpass frequencies 
+            (e.g. "Filtered 24-32 Hz")
+        file_str : str or None : String to append on end of filename to uniquely save figure 
+            (e.g. "24.0_32.0"). If None, function returns a handle to the figure and axes, and does 
+            NOT save the figure. 
+    RETURNS:
+        If file_str=None, returns handle to the figure and axes. Figure is NOT saved.
+        Otherwise, figure is saved as path_home/figures/backaz_{file_str}.png
     '''
-    
-    # sort by semblance to show on plot better
+    # sort by ascending semblance so brightest points are plotted on top
     output = output.sort_values(by="Semblance", ascending=True)
 
-    if plot_type == 'backaz':
-        yvar = output["Backaz"]
-        ax.set_ylabel("Backazimuth [$^o$]")
-        ax.set_ylim([0, 360])
-        ax.set_yticks(ticks=np.arange(0, 360+60, 60))
-    elif plot_type == 'slowness':
-        yvar = output["Slowness"]
-        ax.set_ylabel("Slowness [s/km]")
-        ax.set_yticks(ticks=np.arange(0, int(max(output["Slowness"]))+1, 1))
-    else:
-        raise Exception("Plot type not supported!")
+    # constrain data to only plot points with slownesses near 3 s/km
+    slow_min = 2.5
+    slow_max = 3.5
+    output = output[output["Slowness"].between(slow_min, slow_max)]
 
-    im = ax.scatter(output["Time"], yvar, c=output["Semblance"],
+    # create figure
+    fig, ax = plt.subplots(1, 1, figsize=[7, 5], tight_layout=True)
+    im = ax.scatter(output["Time"], output['Backaz'], c=output["Semblance"],
                     alpha=0.7, edgecolors='none', cmap='plasma',
                     vmin=min(output["Semblance"]), vmax=max(output["Semblance"]))
     cb = fig.colorbar(im, ax=ax)
     cb.set_label("Semblance")
-    return im
+
+    # format y-axis
+    ax.set_ylabel("Backazimuth [$^o$]")
+    ax.set_ylim([0, 360])
+    ax.set_yticks(ticks=np.arange(0, 360+60, 60))
+
+    # format x-axis
+    ax.set_xlabel("Mountain Time (Local)")
+    ax.set_xlim([output["Time"].min(), output["Time"].max()])
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
+    fig.autofmt_xdate()
+
+    # add titles
+    fig.suptitle(f"Backazimuth")
+    ax.set_title(subtitle_str, fontsize=10)
+
+    if file_str == None:
+        return fig, ax
+    else: 
+        # save figure
+        plt.savefig(os.path.join(path_home, "figures", f"backaz_{file_str}.png"), dpi=500)
+        plt.close()
+        return
+
+
