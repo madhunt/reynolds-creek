@@ -266,3 +266,30 @@
 /home/mad/Documents/research/reynolds-creek/data/mseed
 2024-06-17 14:47:32.357735 		 Processing Data (24.0_32.0)
 /home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-17 14:54:31.143276 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:56:11.071331 		 Loading and Filtering Data(2023-10-8 24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:03:37.004486 		 Loading and Filtering Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:03:43.251503 		 Processing Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl
+------------------------------------------------------------------------------
+2024-06-17 15:04:06.898661 		 Loading and Filtering Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:04:13.524092 		 Processing Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl
+2024-06-17 15:08:00.998456 		 Loading and Filtering Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:08:07.106845 		 Processing Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 15:10:59.464156 		 Loading and Filtering Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:11:05.738519 		 Processing Data (2023-10-8_24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 15:12:20.082957 		 Loading and Filtering Data (2023-10-8_24.0_32.0)
+    /home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 15:12:25.812979 		 Processing Data (2023-10-8_24.0_32.0)
+    /home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl

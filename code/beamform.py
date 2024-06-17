@@ -18,18 +18,21 @@ def main(path_home, process=False, backaz_plot=False,
     freqmin = filter_options['freqmin']
     freqmax = filter_options['freqmax']
     filt_freq_str = f"{freqmin}_{freqmax}"
+    filt_date_str = f"{time_start.year}-{time_start.month}-{time_start.day}"
+    file_str = f"{filt_date_str}_{filt_freq_str}"
+
     path_processed = os.path.join(path_home, "data", "processed", 
-                    f"processed_output_{filt_freq_str}.pkl")
+                    f"processed_output_{file_str}.pkl")
 
     # print progress to log file
     with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
-        print(f"{datetime.datetime.now()} \t\t Loading and Filtering Data ({filt_freq_str})", file=f)
-        print(path_data, file=f)
+        print((f"{datetime.datetime.now()} \t\t Loading and Filtering Data ")+
+              (f"({file_str})"), file=f)
+        print("    "+path_data, file=f)
 
     # load data
     #TODO option for highpass or lowpass only
 
-    #FIXME START HERE
     data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
                     time_start=time_start, time_stop=time_stop,
                      filter_type='bandpass', **filter_options)
@@ -37,8 +40,9 @@ def main(path_home, process=False, backaz_plot=False,
     if process == True:
         # print progress to log file
         with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
-            print(f"{datetime.datetime.now()} \t\t Processing Data ({filt_freq_str})", file=f)
-            print(path_processed, file=f)
+            print((f"{datetime.datetime.now()} \t\t Processing Data ")+
+                  (f"({file_str})"), file=f)
+            print("    "+path_processed, file=f)
 
         # fiter and beamform 
         output = process_data(data, path_processed, 
@@ -51,15 +55,13 @@ def main(path_home, process=False, backaz_plot=False,
     if backaz_plot == True:
         # print progress to log file
         with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
-            print(f"{datetime.datetime.now()} \t\t Plotting Backazimuth ({filt_freq_str})", file=f)
+            print((f"{datetime.datetime.now()} \t\t Plotting Backazimuth ")+ 
+                  (f"({file_str})"), file=f)
+            print("    "+os.path.join(path_home, "figures", f"backaz_{file_str}.png"), file=f)
 
         # plot backaz time series
         plot_utils.plot_backaz(output, path_home, 
-                               f"Filtered {freqmin} to {freqmax} Hz", filt_freq_str)
-
-        # plot slowness space
-        #FIXME currently not working as intended
-        #plot_utils.plot_slowness(output, path_home, id_str=filt_freq_str)
+                               f"Filtered {freqmin} to {freqmax} Hz", file_str)
     
     return
 
@@ -193,6 +195,10 @@ if __name__ == "__main__":
         time_stop = None
     if args.time_stop != None:
         time_stop = UTCDateTime(int(time_stop[0]), int(time_stop[1]), int(time_stop[2]))
+
+
+    with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
+        print("-----------------------------------NEW RUN-----------------------------------", file=f)
 
     if args.freq_bp != None:
         main(path_home=args.path_home, 
