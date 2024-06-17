@@ -1,0 +1,6 @@
+Time Submitted        = Fri Jun 14 11:02:43 MDT 2024
+Hostname              = cpu105
+PWD                   = /bsuhome/madelinehunt/reynolds-creek
+Num Nodes Allocated   = 1
+Num Tasks Allocated   = 1
+slurmstepd: error: *** JOB 1087727 ON cpu105 CANCELLED AT 2024-06-14T11:07:05 ***
