@@ -5,11 +5,13 @@ import argparse, math, os, datetime
 import numpy as np
 import pandas as pd
 from obspy.core.util import AttribDict
+from obspy.core.utcdatetime import UTCDateTime
 from obspy.signal.array_analysis import array_processing
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib.dates import num2date
 
-def main(path_home, process=False, backaz_plot=False,
+def main(path_home, process=False, backaz_plot=False, 
+         time_start=None, time_stop=None, 
          filter_options=None, gem_include=None, gem_exclude=None):
 
     path_data = os.path.join(path_home, "data", "mseed")
@@ -26,7 +28,10 @@ def main(path_home, process=False, backaz_plot=False,
 
     # load data
     #TODO option for highpass or lowpass only
+
+    #FIXME START HERE
     data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
+                    time_start=time_start, time_stop=time_stop,
                      filter_type='bandpass', **filter_options)
     
     if process == True:
@@ -36,7 +41,8 @@ def main(path_home, process=False, backaz_plot=False,
             print(path_processed, file=f)
 
         # fiter and beamform 
-        output = process_data(data, path_processed, time_start=None, time_end=None, filter_options=filter_options)
+        output = process_data(data, path_processed, 
+                              time_start=time_start, time_stop=time_stop, filter_options=filter_options)
 
     else:
         # data has already been processed
@@ -58,7 +64,7 @@ def main(path_home, process=False, backaz_plot=False,
     return
 
 
-def process_data(data, path_processed, time_start=None, time_end=None, filter_options=None):
+def process_data(data, path_processed, time_start=None, time_stop=None, filter_options=None):
     '''
     Run obspy array_processing() function to beamform data. Save in .npy format to specified 
     location. Returns output as np array, with backazimuths from 0-360.
@@ -67,7 +73,7 @@ def process_data(data, path_processed, time_start=None, time_end=None, filter_op
         path_processed : str : path and filename to save output as .npy
         time_start : obspy UTCDateTime : if specified, time to start beamforming. If not specified, 
             will use max start time from all Gems.
-        time_end : obspy UTCDateTime : if specified, time to end beamforming. If not specified, 
+        time_stop : obspy UTCDateTime : if specified, time to end beamforming. If not specified, 
             will use min end time from all Gems.
     RETURNS
         output : pd dataframe : array with 5 rows of output from array_processing. Rows are: timestamp, 
@@ -77,10 +83,9 @@ def process_data(data, path_processed, time_start=None, time_end=None, filter_op
 
     # if times are not provided, use max/min start and end times from gems
     if time_start == None:
-        # specify start time
         time_start = max([trace.stats.starttime for trace in data])
-    if time_end == None:
-        time_end = min([trace.stats.endtime for trace in data])
+    if time_stop == None:
+        time_stop = min([trace.stats.endtime for trace in data])
 
     
     #FIXME can clean this up when these change
@@ -93,7 +98,7 @@ def process_data(data, path_processed, time_start=None, time_end=None, filter_op
         frqlow=filter_options['freqmin'], frqhigh=filter_options['freqmax'], prewhiten=0,
         # output restrictions
         semb_thres=-1e9, vel_thres=-1e9, timestamp='mlabday',
-        stime=time_start, etime=time_end)
+        stime=time_start, etime=time_stop)
     
     output = array_processing(stream=data, **process_kwargs)
 
@@ -141,7 +146,17 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Flag if backazimuth plots should be created.")
-    
+    parser.add_argument("-t1", "--time_start", 
+                        dest="time_start",
+                        default=None,
+                        type=str,
+                        help="Time to start data processing in format YYYY-MM-DD")
+    parser.add_argument("-t2", "--time_stop", 
+                        dest="time_stop",
+                        default=None,
+                        type=str,
+                        help="Time to stop data processing in format YYYY-MM-DD")
+
     freqs = parser.add_mutually_exclusive_group(required=True)
     freqs.add_argument("-f", "--freq",
             nargs=2,
@@ -168,11 +183,23 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
+    if args.time_start != None:
+        time_start = args.time_start.split("-")
+        time_start = UTCDateTime(int(time_start[0]), int(time_start[1]), int(time_start[2]))
+        if args.time_stop == None:
+            time_stop = time_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+    else:
+        time_start = None
+        time_stop = None
+    if args.time_stop != None:
+        time_stop = UTCDateTime(int(time_stop[0]), int(time_stop[1]), int(time_stop[2]))
 
     if args.freq_bp != None:
         main(path_home=args.path_home, 
             process=args.process, 
             backaz_plot=args.backaz_plot,
+            time_start=time_start,
+            time_stop=time_stop,
             filter_options=dict(freqmin=args.freq_bp[0], 
                                 freqmax=args.freq_bp[1]),
             gem_include=utils.arg_split_comma(args.gem_include),

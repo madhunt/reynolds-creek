@@ -217,3 +217,52 @@
 /home/mad/Documents/research/reynolds-creek/data/mseed
 2024-06-10 16:32:20.278774 		 Plotting Backazimuth (0.5_2.0)
 2024-06-10 16:32:29.357933 		 Completed Processing
+2024-06-11 17:49:08.468338 		 Loading and Filtering Data (0.5_2.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-11 17:49:17.821388 		 Plotting Backazimuth (0.5_2.0)
+2024-06-11 17:49:26.210483 		 Completed Processing
+2024-06-11 17:49:35.974117 		 Loading and Filtering Data (0.5_2.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-11 17:49:42.527510 		 Plotting Backazimuth (0.5_2.0)
+2024-06-11 17:49:54.691186 		 Completed Processing
+2024-06-11 17:53:49.074113 		 Loading and Filtering Data (0.5_2.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-11 17:53:54.382091 		 Plotting Backazimuth (0.5_2.0)
+2024-06-11 18:01:26.991930 		 Loading and Filtering Data (0.5_2.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-11 18:01:31.106394 		 Plotting Backazimuth (0.5_2.0)
+2024-06-12 10:31:13.498451 		 Completed Processing
+2024-06-12 11:32:29.580238 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-12 11:33:02.959199 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-12 11:33:09.836118 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-14 14:26:30.234403 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 13:51:08.258076 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 13:51:16.316047 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-17 14:07:32.385618 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:08:29.730778 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:09:13.629941 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:25:24.502181 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-17 14:25:38.128674 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:25:46.227850 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-17 14:44:30.975241 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:44:33.682811 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl
+2024-06-17 14:47:08.441447 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:47:26.589863 		 Loading and Filtering Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-17 14:47:32.357735 		 Processing Data (24.0_32.0)
+/home/mad/Documents/research/reynolds-creek/data/processed/processed_output_24.0_32.0.pkl

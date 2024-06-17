@@ -39,6 +39,10 @@ def plot_traces(data, path_home, id_str):
         for i in range(5):
             if n+i < len(data):
                 trace = data[n+i]
+
+                # downsample the data for faster plotting
+                trace = trace.decimate(10)
+
                 ax[i].plot(trace.times("matplotlib"), trace.data, c=color[n+i])
                 ax[i].set_ylabel(trace.stats["station"])
                 ax[i].grid()
@@ -52,7 +56,8 @@ def plot_traces(data, path_home, id_str):
         fig.suptitle(f"Individual Gem Traces for {id_str} ({curr_fig}/{num_fig})")
 
         id_str_file = id_str.lower().replace(" ", "_")
-        plt.savefig(os.path.join(path_home, "figures", f"traces_{id_str_file}_{curr_fig}.png"), dpi=500)
+        plt.savefig(os.path.join(path_home, "figures", "traces",        
+                                 f"traces_{id_str_file}_{curr_fig}.png"), dpi=500)
         plt.close()
     return
 

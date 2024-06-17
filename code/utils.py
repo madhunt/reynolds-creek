@@ -9,8 +9,8 @@ from obspy.core.util import AttribDict
 
 #TODO add option to specify a date range
 def load_data(path_data, gem_include=None, gem_exclude=None,
+              time_start=None, time_stop=None,
               filter_type=None, **filter_options):
-              #date_start=None, date_end=None,
     '''
     Loads in and pre-processes array data.
         Loads all miniseed files in a specified directory into an obspy stream. 
@@ -24,7 +24,7 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
         gem_exclude : list of str : Optional. If specified, should list Gem station
             names to include in processing. Mutually exclusive with gem_include.
         time_start : 
-        time_end : "YYYY-MM-DD" 
+        time_stop : "YYYY-MM-DD" 
 
         filter_type : str : Optional. Obspy filter type. Includes 'bandpass', 
             'highpass', and 'lowpass'.
@@ -34,25 +34,24 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
         data : obspy stream : Stream of data traces for full array, or specified 
             Gems. Stats include assigned coordinates.
     '''
+    # (1) read in the data
     # paths to mseed and coordinates
     path_mseed = os.path.join(path_data, "*.mseed")
-    #TODO FIXME YIKES
-    path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" ))
-
-    ## only use files in specified date range
-    #if date_start != None:
-    #    # remove all files before start date
-    #    start = datetime.strptime(date_start, "%Y-%m-%d")
-
-    #if date_end != None:
-
-    #    if date_end == date_start:
-    #    # remove all files after end date
-    #    date_end = datetime.strptime(date_end, "%Y-%m-%d")
-
+    path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" )) # FIXME
     # import data as obspy stream
     data = obspy.read(path_mseed)
 
+    # (2) filter by date
+    # merge dates (discard overlaps and leave gaps)
+    data = data.merge(method=0)
+    # only keep data in the time range of interest
+    if time_start != None:
+        data = [trace for trace in data.traces if 
+                (trace.stats.starttime <= time_start) and (trace.stats.endtime >= time_stop)]
+        # convert back to obspy stream
+        data = obspy.Stream(traces=data)
+
+    # (3) add coordinates to traces
     # import coordinates
     coords = pd.DataFrame()
     for file in path_coords:
@@ -60,10 +59,10 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
     coords["Name"] = coords["Name"].astype(str) # SN of gem
     
     # get rid of any stations that don't have coordinates
-    data_list = [trace for trace in data.traces 
+    data = [trace for trace in data.traces 
                     if trace.stats['station'] in coords["Station"].to_list()]
     # convert list back to obspy stream
-    data = obspy.Stream(traces=data_list)
+    data = obspy.Stream(traces=data)
 
     # assign coordinates to stations
     for _, row in coords.iterrows():
@@ -74,15 +73,12 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
                 'longitude': row["Longitude"],
                 'elevation': row["Elevation"] }) 
     
+    # (4) bandpass filter data if desired
     if filter_type != None:
         # filter data
         data = data.filter(filter_type, **filter_options)
-    #TODO
-    # median filter or interpolate??
 
-    # merge dates (discard overlaps and leave gaps)
-    data = data.merge(method=0)
-    
+    # (5) filter by gem station ID 
     # only use specified subset of gems
     if gem_include != None:
         data_subset = [trace for trace in data.traces if trace.stats['station'] in gem_include]
@@ -94,7 +90,6 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
         data = data_subset
 
     return data
-
 
 
 def arg_split_comma(arg):

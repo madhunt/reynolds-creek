@@ -6,45 +6,41 @@ import shutil
 from obspy.io.mseed.util import shift_time_of_file
 
 
-def main(path_home, filter_options=None, 
-         gem_list=None, shift_list=None, 
-         date_start=None, date_end=None):
+def main(path_home, #filter_options=None, 
+         shift_list_gem=None, shift_list_time=None):
+         #date_start=None, date_end=None):
 
     # (1) load in raw data
     print("Loading Raw Data")
     path_raw = os.path.join(path_home, "data", "raw")
     data_raw = utils.load_data(path_raw, gem_include=None, gem_exclude=None, 
-                    filter_type=None, **filter_options)
+                    filter_type=None)#, filter_options=None)
+                    #TODO add time_start and time_stop
 
     # (2) plot raw data
     print("Plotting Raw Data")
     plot_utils.plot_traces(data_raw, path_home, "Raw Data")
 
-    # (3) shift traces (if needed)
-    print("Shifting Traces")
+    # (3) shift traces (if needed) and save data to mseed folder
+    print("Saving mseed Data")
     files_raw = glob.glob(os.path.join(path_raw, "*.mseed" ))
     path_mseed = os.path.join(path_home, "data", "mseed")
 
-    if gem_list != None:
-        # loop through all data
-        for src_path in files_raw:
-            file = os.path.split(src_path)[1]
-            dst_path = os.path.join(path_mseed, file)
+    for src_path in files_raw:
+        file = os.path.split(src_path)[1]
+        dst_path = os.path.join(path_mseed, file)
 
-            # if station needs to be shifted
-            if any(station in file for station in gem_list):
-                i = [i for i, s in enumerate(gem_list) if s in file][0]
-                print(f"Shifting Station {gem_list[i]}")
-                shift_time_of_file(input_file=src_path, 
-                                   output_file=dst_path, 
-                                   timeshift=shift_list[i])
-            #TODO MOVE OUT OF IF STATEMENT???
-            else:
-                # move over the raw data
-                shutil.copy(src=src_path, dst=dst_path)
+        if (shift_list_gem != None) and any(station in file for station in shift_list_gem):
+            # shift needed stations and save
+            i = [i for i, s in enumerate(shift_list_gem) if s in file][0]
+            print(f"Shifting Station {shift_list_gem[i]}")
+            shift_time_of_file(input_file=src_path, 
+                                output_file=dst_path, 
+                                timeshift=shift_list_time[i])
+        else:
+            # just copy raw data
+            shutil.copy(src=src_path, dst=dst_path)
 
-    # (4) replot traces
-    #filt_freq_str = f"{filter_options['freqmin']}_{filter_options['freqmax']}"
     return
 
 
@@ -95,14 +91,21 @@ if __name__ == "__main__":
 
     #FIXME kinda ugly
     if args.gem_shift != None:
-        gem_list = [s.split(",")[0] for row in args.gem_shift for s in row]
-        shift_list = [float(s.split(",")[1]) for row in args.gem_shift for s in row]
+        shift_list_gem = [s.split(",")[0] for row in args.gem_shift for s in row]
+        shift_list_time = [float(s.split(",")[1]) for row in args.gem_shift for s in row]
     else:
-        gem_list = None
-        shift_list = None
+        shift_list_gem = None
+        shift_list_time = None
 
-    main(path_home=args.path_home, 
-         filter_options=dict(freqmin=args.freqs[0], 
-                             freqmax=args.freqs[1]),
-        #date_start=args.date_start, date_end=args.date_end,
-        gem_list=gem_list, shift_list=shift_list)
+    if args.freqs != None:
+        main(path_home=args.path_home, 
+            filter_options=dict(freqmin=args.freqs[0], 
+                                freqmax=args.freqs[1]),
+            #date_start=args.date_start, date_end=args.date_end,
+            shift_list_gem=shift_list_gem, shift_list_time=shift_list_time)
+    else:
+        main(path_home=args.path_home, 
+            #filter_options=None,
+            #date_start=args.date_start, date_end=args.date_end,
+            shift_list_gem=shift_list_gem, shift_list_time=shift_list_time)
+
