@@ -1,0 +1,22 @@
+Time Submitted        = Mon Jun 17 20:26:41 MDT 2024
+Hostname              = cpu117
+PWD                   = /bsuhome/madelinehunt/reynolds-creek
+Num Nodes Allocated   = 1
+Num Tasks Allocated   = 1
+Traceback (most recent call last):
+  File "/bsuhome/madelinehunt/reynolds-creek/code/beamform.py", line 204, in <module>
+    main(path_home=args.path_home, 
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bsuhome/madelinehunt/reynolds-creek/code/beamform.py", line 36, in main
+    data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bsuhome/madelinehunt/reynolds-creek/code/utils.py", line 79, in load_data
+    data = data.filter(filter_type, **filter_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bsuhome/madelinehunt/miniforge3/envs/array/lib/python3.12/site-packages/decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bsuhome/madelinehunt/miniforge3/envs/array/lib/python3.12/site-packages/obspy/core/util/decorator.py", line 231, in raise_if_masked
+    raise NotImplementedError(msg)
+NotImplementedError: Trace with masked values found. This is not supported for this operation. Try the split() method on Trace/Stream to produce a Stream with unmasked Traces.
+Time Completed        = Mon Jun 17 20:26:54 MDT 2024

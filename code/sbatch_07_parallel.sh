@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J PARALLEL_BEAM                # job name
+#SBATCH -J 10-07               # job name
 #SBATCH -o ./code/log/log_slurm.o%j     # output and error file
 #SBATCH -n 1                            # num tasks requested
 #SBATCH -N 1                            # num nodes
@@ -18,6 +18,6 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 
 . ~/.bashrc
 mamba activate array
-python -u code/beamform.py -p -b -F 0.5 40 -x TOP07
+python -u code/beamform.py -p -b -F 0.5 32 -x TOP07 -t1 2023-10-07
 
 echo "Time Completed        = $(date)"

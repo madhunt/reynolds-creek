@@ -293,3 +293,30 @@
     /home/mad/Documents/research/reynolds-creek/data/mseed
 2024-06-17 15:12:25.812979 		 Processing Data (2023-10-8_24.0_32.0)
     /home/mad/Documents/research/reynolds-creek/data/processed/processed_output_2023-10-8_24.0_32.0.pkl
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 17:13:25.136442 		 Completed Processing
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 17:13:27.766303 		 Completed Processing
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 17:13:29.922660 		 Completed Processing
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 18:17:51.108265 		 Completed Processing
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 19:16:31.741450 		 Loading and Filtering Data (2023-10-8_2.0_5.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-17 19:17:03.080352 		 Processing Data (2023-10-8_2.0_5.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2023-10-8_2.0_5.0.pkl
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 20:21:42.228980 		 Loading and Filtering Data (2023-10-6_2.0_5.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 20:22:07.999680 		 Loading and Filtering Data (2023-10-8_0.5_10.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-17 20:22:25.305206 		 Processing Data (2023-10-8_0.5_10.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_2023-10-8_0.5_10.0.pkl
+-----------------------------------NEW RUN-----------------------------------
+2024-06-17 20:26:45.313040 		 Loading and Filtering Data (2023-10-6_0.5_10.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-17 22:56:34.354495 		 Plotting Backazimuth (2023-10-8_2.0_5.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_2023-10-8_2.0_5.0.png
+2024-06-17 22:56:35.849112 		 Completed Processing

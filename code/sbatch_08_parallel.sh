@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J HELI_BEAM                    # job name
+#SBATCH -J 10-08               # job name
 #SBATCH -o ./code/log/log_slurm.o%j     # output and error file
 #SBATCH -n 1                            # num tasks requested
 #SBATCH -N 1                            # num nodes
@@ -18,6 +18,6 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 
 . ~/.bashrc
 mamba activate array
-python -u code/beamform.py -p -b -f 24 32 -x TOP07
+python -u code/beamform.py -p -b -f 0.5 10 -x TOP07 -t1 2023-10-08
 
 echo "Time Completed        = $(date)"
