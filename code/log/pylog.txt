@@ -320,3 +320,8 @@
 2024-06-17 22:56:34.354495 		 Plotting Backazimuth (2023-10-8_2.0_5.0)
     /bsuhome/madelinehunt/reynolds-creek/figures/backaz_2023-10-8_2.0_5.0.png
 2024-06-17 22:56:35.849112 		 Completed Processing
+-----------------------------------NEW RUN-----------------------------------
+2024-06-20 14:02:29.402931 		 Loading and Filtering Data (JD_2023-10-6_24.0_32.0)
+    /home/mad/Documents/research/reynolds-creek/data/mseed
+2024-06-20 14:02:33.541802 		 Processing Data (JD_2023-10-6_24.0_32.0)
+    /home/mad/Documents/research/reynolds-creek/data/processed/processed_output_JD_2023-10-6_24.0_32.0.pkl
