@@ -26,6 +26,9 @@ def plot_traces(data, path_home, id_str):
     num_fig = int(math.ceil(N/5))
     color = cm.rainbow(np.linspace(0, 1, N))
 
+    # downsample data for faster plotting
+    data = data.split().decimate(10).merge(method=0)
+
     # choose ylim values from min/max of all data
     y_max = max(data.max())
     y_min = min(data.max()) # no data.min(), but max() includes most negative vals
@@ -39,9 +42,6 @@ def plot_traces(data, path_home, id_str):
         for i in range(5):
             if n+i < len(data):
                 trace = data[n+i]
-
-                # downsample the data for faster plotting
-                trace = trace.decimate(10)
 
                 ax[i].plot(trace.times("matplotlib"), trace.data, c=color[n+i])
                 ax[i].set_ylabel(trace.stats["station"])

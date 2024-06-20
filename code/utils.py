@@ -5,10 +5,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 from obspy.core.util import AttribDict
 
-
-
-#TODO add option to specify a date range
-def load_data(path_data, gem_include=None, gem_exclude=None,
+def load_data(path_data, array_str=None,
+              gem_include=None, gem_exclude=None,
               time_start=None, time_stop=None,
               filter_type=None, **filter_options):
     '''
@@ -36,12 +34,26 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
     '''
     # (1) read in the data
     # paths to mseed and coordinates
-    path_mseed = os.path.join(path_data, "*.mseed")
+    path_mseed = glob.glob(os.path.join(path_data, f"*{array_str}*.mseed"))
     path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" )) # FIXME
-    # import data as obspy stream
-    data = obspy.read(path_mseed)
 
-    # (2) filter by date
+    # import data as obspy stream
+    #data = obspy.read(path_mseed)
+    data = obspy.Stream()
+    for path in path_mseed:
+        tmp_data = obspy.read(path)
+        for tr in tmp_data:
+            # save path information for each trace
+            tr.stats['path'] = path
+        data += tmp_data
+
+    # (2) bandpass filter data if desired
+    if filter_type != None:
+        # filter data
+        # NOTE this needs to happen before data.merge()
+        data = data.filter(filter_type, **filter_options)
+
+    # (3) filter by date
     # merge dates (discard overlaps and leave gaps)
     data = data.merge(method=0)
     # only keep data in the time range of interest
@@ -50,8 +62,8 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
                 (trace.stats.starttime <= time_start) and (trace.stats.endtime >= time_stop)]
         # convert back to obspy stream
         data = obspy.Stream(traces=data)
-
-    # (3) add coordinates to traces
+    
+    # (4) add coordinates to traces
     # import coordinates
     coords = pd.DataFrame()
     for file in path_coords:
@@ -73,11 +85,6 @@ def load_data(path_data, gem_include=None, gem_exclude=None,
                 'longitude': row["Longitude"],
                 'elevation': row["Elevation"] }) 
     
-    # (4) bandpass filter data if desired
-    if filter_type != None:
-        # filter data
-        data = data.filter(filter_type, **filter_options)
-
     # (5) filter by gem station ID 
     # only use specified subset of gems
     if gem_include != None:
