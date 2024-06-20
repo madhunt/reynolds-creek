@@ -32,7 +32,7 @@ def main(path_home, array_str=None,
     data_raw = utils.load_data(path_raw, array_str=array_str, 
                                gem_include=None, gem_exclude=None, 
                                time_start=time_start, time_stop=time_stop,
-                               filter_type=None)
+                               freqmin=None, freqmax=None)
 
     # (2) plot raw data
     print("Plotting Raw Data")

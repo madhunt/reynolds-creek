@@ -4,22 +4,22 @@ import plot_utils, utils
 import argparse, math, os, datetime
 import numpy as np
 import pandas as pd
-from obspy.core.util import AttribDict
+#from obspy.core.util import AttribDict
 from obspy.core.utcdatetime import UTCDateTime
 from obspy.signal.array_analysis import array_processing
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib.dates import num2date
 
-def main(path_home, process=False, backaz_plot=False, 
+def main(path_home, process=False, 
+         array_str=None,
+         gem_include=None, gem_exclude=None,
          time_start=None, time_stop=None, 
-         filter_options=None, gem_include=None, gem_exclude=None):
+         freqmin=None, freqmax=None):
 
     path_data = os.path.join(path_home, "data", "mseed")
-    freqmin = filter_options['freqmin']
-    freqmax = filter_options['freqmax']
     filt_freq_str = f"{freqmin}_{freqmax}"
     filt_date_str = f"{time_start.year}-{time_start.month}-{time_start.day}"
-    file_str = f"{filt_date_str}_{filt_freq_str}"
+    file_str = f"{array_str}_{filt_date_str}_{filt_freq_str}"
 
     path_processed = os.path.join(path_home, "data", "processed", 
                     f"processed_output_{file_str}.pkl")
@@ -32,10 +32,10 @@ def main(path_home, process=False, backaz_plot=False,
 
     # load data
     #TODO option for highpass or lowpass only
-
-    data = utils.load_data(path_data, gem_include=gem_include, gem_exclude=gem_exclude, 
-                    time_start=time_start, time_stop=time_stop,
-                     filter_type='bandpass', **filter_options)
+    data = utils.load_data(path_data, array_str=array_str,
+                           gem_include=gem_include, gem_exclude=gem_exclude, 
+                           time_start=time_start, time_stop=time_stop,
+                           freqmin=freqmin, freqmax=freqmax)
     
     if process == True:
         # print progress to log file
@@ -46,27 +46,27 @@ def main(path_home, process=False, backaz_plot=False,
 
         # fiter and beamform 
         output = process_data(data, path_processed, 
-                              time_start=time_start, time_stop=time_stop, filter_options=filter_options)
+                              time_start=time_start, time_stop=time_stop, 
+                              freqmin=freqmin, freqmax=freqmax)
 
     else:
         # data has already been processed
         output = pd.read_pickle(path_processed)
     
-    if backaz_plot == True:
-        # print progress to log file
-        with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
-            print((f"{datetime.datetime.now()} \t\t Plotting Backazimuth ")+ 
-                  (f"({file_str})"), file=f)
-            print("    "+os.path.join(path_home, "figures", f"backaz_{file_str}.png"), file=f)
+    # print progress to log file
+    with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
+        print((f"{datetime.datetime.now()} \t\t Plotting Backazimuth ")+ 
+                (f"({file_str})"), file=f)
+        print("    "+os.path.join(path_home, "figures", f"backaz_{file_str}.png"), file=f)
 
-        # plot backaz time series
-        plot_utils.plot_backaz(output, path_home, 
-                               f"Filtered {freqmin} to {freqmax} Hz", file_str)
+    # plot backaz time series
+    plot_utils.plot_backaz(output, path_home, 
+                            f"Filtered {freqmin} to {freqmax} Hz", file_str)
     
     return
 
 
-def process_data(data, path_processed, time_start=None, time_stop=None, filter_options=None):
+def process_data(data, path_processed, time_start=None, time_stop=None, freqmin=None, freqmax=None):
     '''
     Run obspy array_processing() function to beamform data. Save in .npy format to specified 
     location. Returns output as np array, with backazimuths from 0-360.
@@ -97,7 +97,7 @@ def process_data(data, path_processed, time_start=None, time_stop=None, filter_o
         # sliding window
         win_len=60, win_frac=0.50,
         # frequency
-        frqlow=filter_options['freqmin'], frqhigh=filter_options['freqmax'], prewhiten=0,
+        frqlow=freqmin, frqhigh=freqmax, prewhiten=0,
         # output restrictions
         semb_thres=-1e9, vel_thres=-1e9, timestamp='mlabday',
         stime=time_start, etime=time_stop)
@@ -141,13 +141,12 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Flag if data should be processed.")
-    #FIXME dont really need this as an arg bc i will always want to plot
-    # maybe?
-    parser.add_argument("-b", "--plot-backaz",
-                        dest="backaz_plot",
-                        default=False,
-                        action="store_true",
-                        help="Flag if backazimuth plots should be created.")
+    parser.add_argument("-a", "--array",
+            dest="array_str",
+            type=str,
+            default=None,
+            help="Array ID (e.g. TOP or JD)")
+
     parser.add_argument("-t1", "--time_start", 
                         dest="time_start",
                         default=None,
@@ -194,25 +193,24 @@ if __name__ == "__main__":
         time_start = None
         time_stop = None
     if args.time_stop != None:
+        time_stop = args.time_stop.split("-")
         time_stop = UTCDateTime(int(time_stop[0]), int(time_stop[1]), int(time_stop[2]))
+        time_stop = time_stop + datetime.timedelta(hours=23, minutes=59, seconds=59)
 
 
     with open(os.path.join(path_home, "code", "log", "pylog.txt"), "a") as f:
         print("-----------------------------------NEW RUN-----------------------------------", file=f)
 
     if args.freq_bp != None:
-        main(path_home=args.path_home, 
-            process=args.process, 
-            backaz_plot=args.backaz_plot,
-            time_start=time_start,
-            time_stop=time_stop,
-            filter_options=dict(freqmin=args.freq_bp[0], 
-                                freqmax=args.freq_bp[1]),
+        main(path_home=args.path_home, process=args.process, 
+            array_str=args.array_str,
             gem_include=utils.arg_split_comma(args.gem_include),
-            gem_exclude=utils.arg_split_comma(args.gem_exclude))
+            gem_exclude=utils.arg_split_comma(args.gem_exclude),
+            time_start=time_start, time_stop=time_stop,
+            freqmin=args.freq_bp[0], freqmax=args.freq_bp[1])
+
     elif args.freq_range != None:
         # multiple frequencies specified
-
         #TODO what if you don't want octaves??
         pwr_min = math.log(args.freq_range[0], 2)
         pwr_max = math.log(args.freq_range[1], 2)
@@ -220,14 +218,12 @@ if __name__ == "__main__":
 
         #NOTE for Borah (48 cores per node)
         with ProcessPoolExecutor(max_workers=48) as pool:
-
-            args_list = [[args.path_home, 
-                        args.process, 
-                        args.backaz_plot,
-                        dict(freqmin=freqmin, 
-                            freqmax=freqmax),
-                        utils.arg_split_comma(args.gem_include),
-                        utils.arg_split_comma(args.gem_exclude)]
+            args_list = [[args.path_home, args.process, 
+                          args.array_str,
+                          utils.arg_split_comma(args.gem_include),
+                          utils.arg_split_comma(args.gem_exclude),
+                          time_start, time_stop,
+                          freqmin, freqmax] 
                         for freqmin in freq_list for freqmax in freq_list if freqmin < freqmax]
 
             # run through different filters in parallel

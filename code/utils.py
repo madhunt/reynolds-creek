@@ -8,7 +8,7 @@ from obspy.core.util import AttribDict
 def load_data(path_data, array_str=None,
               gem_include=None, gem_exclude=None,
               time_start=None, time_stop=None,
-              filter_type=None, **filter_options):
+              freqmin=None, freqmax=None):
     '''
     Loads in and pre-processes array data.
         Loads all miniseed files in a specified directory into an obspy stream. 
@@ -48,10 +48,10 @@ def load_data(path_data, array_str=None,
         data += tmp_data
 
     # (2) bandpass filter data if desired
-    if filter_type != None:
+    if freqmin != None and freqmax != None:
         # filter data
         # NOTE this needs to happen before data.merge()
-        data = data.filter(filter_type, **filter_options)
+        data = data.filter('bandpass', freqmin=freqmin, freqmax=freqmax)
 
     # (3) filter by date
     # merge dates (discard overlaps and leave gaps)
