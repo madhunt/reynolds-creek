@@ -2,7 +2,7 @@
 
 # run this from the home/code/ dir
 
-#SBATCH -o ./code/log/log_slurm.o%j     # output and error file
+#SBATCH -o ./log/log_slurm.o%j     # output and error file
 #SBATCH -n 1                            # num tasks requested
 #SBATCH -N 1                            # num nodes
 #SBATCH -c 48                           # one node worth of cores
@@ -21,6 +21,6 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 
 . ~/.bashrc
 mamba activate array
-python -u beamform.py -p -a TOP -F 0.5 32 -x TOP07 -t1 $1
+python -u beamform.py -p -a JD -F 0.5 40 -t1 $1
 
 echo "Time Completed        = $(date)"

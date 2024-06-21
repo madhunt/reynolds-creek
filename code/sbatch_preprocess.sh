@@ -18,6 +18,6 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 
 . ~/.bashrc
 mamba activate array
-python -u code/preprocess.py 
+python -u code/preprocess.py -a JD -t1 2023-10-05 -t2 2023-10-08
 
 echo "Time Completed        = $(date)"
