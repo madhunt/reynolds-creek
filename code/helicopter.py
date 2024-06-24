@@ -14,8 +14,10 @@ import xmltodict
 
 def main(path_home):
 
-    freqmin = 2.0
-    freqmax = 5.0
+    date_list = ["2023-10-7", "2023-10-8", "2023-10-6"]#, "2023-10-5"]
+    array_str = "JD"
+    freqmin = 4.0
+    freqmax = 8.0
     freq_str = f"{freqmin}_{freqmax}"
 
     # load in helicopter data
@@ -23,12 +25,18 @@ def main(path_home):
     data_heli = adsb_kml_to_df(path_heli)
 
     # convert heli coords to dist/azimuth from array
-    data_heli = helicoords_to_az(path_home, data_heli)
+    data_heli = helicoords_to_az(path_home, data_heli, array_str)
 
     # load processed infrasound data
-    path_processed = os.path.join(path_home, "data", "processed",
-                    "window_60s", f"processed_output_{freq_str}.pkl")
-    output = pd.read_pickle(path_processed)
+    # path to data on harddrive
+    path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
+                                  "reynolds-creek", "results_processed", "data")
+    #path_processed = os.path.join(path_home, "data", "processed", "window_60s")
+    output = pd.DataFrame()
+    for date_str in date_list:
+        file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
+        output_tmp = pd.read_pickle(file)
+        output = pd.concat([output, output_tmp])
 
     # plot processed data
     fig, ax = plot_utils.plot_backaz(output=output, path_home=path_home, 
@@ -36,16 +44,12 @@ def main(path_home):
     
     # plot heli data
     ax.plot(data_heli['Time'], data_heli['Azimuth'], '.', color='green', 
-            alpha=0.5, label='Helicopter Track')
+            alpha=0.1, label='Helicopter Track')
     ax.legend(loc='lower left')
 
     # save figure
-    plt.savefig(os.path.join(path_home, "figures", f"backaz_{freq_str}.png"), dpi=500)
+    plt.savefig(os.path.join(path_home, "figures", f"backaz_{array_str}_{freq_str}.png"), dpi=500)
     plt.close()
-
-
-
-    plt.show()
 
 
 
@@ -95,7 +99,7 @@ def adsb_kml_to_df(path):
     return data_all
     
 
-def station_coords_avg(path_home):
+def station_coords_avg(path_home, array_str):
     '''
     Find mean location for entire array. 
     INPUTS: 
@@ -110,7 +114,8 @@ def station_coords_avg(path_home):
     coords = pd.DataFrame()
     for file in path_coords:
         coords = pd.concat([coords, pd.read_csv(file)])
-    coords["Name"] = coords["Name"].astype(str) # SN of gem
+    # filter by array
+    coords = coords[coords["Station"].str.contains(array_str)]
 
     lat = coords['Latitude'].mean()
     lon = coords['Longitude'].mean()
@@ -119,10 +124,10 @@ def station_coords_avg(path_home):
     return lat, lon, elv
 
 
-def helicoords_to_az(path_home, data):
+def helicoords_to_az(path_home, data, array_str):
 
-    # find avg location for entire TOP array 
-    coords_top = station_coords_avg(path_home)
+    # find avg location for entire array specified
+    coords_top = station_coords_avg(path_home, array_str)
 
     # use gps2dist to get distance and azimuth between heli and TOP array
     data[['Distance', 'Azimuth', 'az2']] = data.apply(lambda x: 
