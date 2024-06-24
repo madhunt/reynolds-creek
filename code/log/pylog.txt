@@ -636,3 +636,558 @@
     /bsuhome/madelinehunt/reynolds-creek/figures/backaz_TOP_2023-10-7_8.0_16.0.png
 2024-06-21 03:18:24.662329 		 Plotting Backazimuth (TOP_2023-10-8_8.0_16.0)
     /bsuhome/madelinehunt/reynolds-creek/figures/backaz_TOP_2023-10-8_8.0_16.0.png
+-----------------------------------NEW RUN-----------------------------------
+2024-06-21 10:20:36.573068 		 Loading and Filtering Data (JD_2023-10-6_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.573172 		 Loading and Filtering Data (JD_2023-10-6_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.574285 		 Loading and Filtering Data (JD_2023-10-6_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.574291 		 Loading and Filtering Data (JD_2023-10-6_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.574400 		 Loading and Filtering Data (JD_2023-10-6_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.575049 		 Loading and Filtering Data (JD_2023-10-6_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.575048 		 Loading and Filtering Data (JD_2023-10-6_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.576029 		 Loading and Filtering Data (JD_2023-10-6_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.576794 		 Loading and Filtering Data (JD_2023-10-6_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.576800 		 Loading and Filtering Data (JD_2023-10-6_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.576836 		 Loading and Filtering Data (JD_2023-10-6_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.577748 		 Loading and Filtering Data (JD_2023-10-6_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.577759 		 Loading and Filtering Data (JD_2023-10-6_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.577797 		 Loading and Filtering Data (JD_2023-10-6_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.578258 		 Loading and Filtering Data (JD_2023-10-6_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.578831 		 Loading and Filtering Data (JD_2023-10-6_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.579455 		 Loading and Filtering Data (JD_2023-10-6_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.579916 		 Loading and Filtering Data (JD_2023-10-6_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.580282 		 Loading and Filtering Data (JD_2023-10-6_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.580786 		 Loading and Filtering Data (JD_2023-10-6_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.581262 		 Loading and Filtering Data (JD_2023-10-6_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+-----------------------------------NEW RUN-----------------------------------
+2024-06-21 10:20:36.785445 		 Loading and Filtering Data (JD_2023-10-5_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.785539 		 Loading and Filtering Data (JD_2023-10-5_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.786378 		 Loading and Filtering Data (JD_2023-10-5_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.786862 		 Loading and Filtering Data (JD_2023-10-5_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.786926 		 Loading and Filtering Data (JD_2023-10-5_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.786946 		 Loading and Filtering Data (JD_2023-10-5_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.787494 		 Loading and Filtering Data (JD_2023-10-5_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.788444 		 Loading and Filtering Data (JD_2023-10-5_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.788814 		 Loading and Filtering Data (JD_2023-10-5_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.788826 		 Loading and Filtering Data (JD_2023-10-5_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.789215 		 Loading and Filtering Data (JD_2023-10-5_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.789567 		 Loading and Filtering Data (JD_2023-10-5_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.790435 		 Loading and Filtering Data (JD_2023-10-5_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.790919 		 Loading and Filtering Data (JD_2023-10-5_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.790944 		 Loading and Filtering Data (JD_2023-10-5_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.791405 		 Loading and Filtering Data (JD_2023-10-5_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.791829 		 Loading and Filtering Data (JD_2023-10-5_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.792803 		 Loading and Filtering Data (JD_2023-10-5_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.793311 		 Loading and Filtering Data (JD_2023-10-5_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.793322 		 Loading and Filtering Data (JD_2023-10-5_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:36.793335 		 Loading and Filtering Data (JD_2023-10-5_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:20:54.731170 		 Processing Data (JD_2023-10-6_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_1.0_4.0.pkl
+2024-06-21 10:20:54.843642 		 Processing Data (JD_2023-10-6_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_2.0_4.0.pkl
+2024-06-21 10:20:54.881221 		 Processing Data (JD_2023-10-6_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_16.0.pkl
+2024-06-21 10:20:54.939810 		 Processing Data (JD_2023-10-6_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_4.0.pkl
+2024-06-21 10:20:54.964104 		 Processing Data (JD_2023-10-6_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_32.0.pkl
+2024-06-21 10:20:54.988562 		 Processing Data (JD_2023-10-6_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_1.0_8.0.pkl
+2024-06-21 10:20:55.518272 		 Processing Data (JD_2023-10-6_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_16.0_32.0.pkl
+2024-06-21 10:20:55.591911 		 Processing Data (JD_2023-10-6_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_8.0.pkl
+2024-06-21 10:20:55.594811 		 Processing Data (JD_2023-10-6_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_8.0_16.0.pkl
+2024-06-21 10:20:56.194848 		 Processing Data (JD_2023-10-6_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_1.0_2.0.pkl
+2024-06-21 10:20:56.428528 		 Processing Data (JD_2023-10-6_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_4.0_16.0.pkl
+2024-06-21 10:20:56.480235 		 Processing Data (JD_2023-10-6_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_2.0_8.0.pkl
+2024-06-21 10:20:56.480280 		 Processing Data (JD_2023-10-6_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_2.0_16.0.pkl
+2024-06-21 10:20:56.486544 		 Processing Data (JD_2023-10-6_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_8.0_32.0.pkl
+2024-06-21 10:20:56.497436 		 Processing Data (JD_2023-10-6_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_1.0.pkl
+2024-06-21 10:20:56.502010 		 Processing Data (JD_2023-10-6_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_1.0_32.0.pkl
+2024-06-21 10:20:56.787989 		 Processing Data (JD_2023-10-6_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_0.5_2.0.pkl
+2024-06-21 10:20:57.104126 		 Processing Data (JD_2023-10-6_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_1.0_16.0.pkl
+2024-06-21 10:20:57.143896 		 Processing Data (JD_2023-10-6_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_4.0_8.0.pkl
+2024-06-21 10:20:57.727653 		 Processing Data (JD_2023-10-6_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_2.0_32.0.pkl
+2024-06-21 10:20:57.864698 		 Processing Data (JD_2023-10-6_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-6_4.0_32.0.pkl
+2024-06-21 10:21:03.838127 		 Processing Data (JD_2023-10-5_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_2.0_32.0.pkl
+2024-06-21 10:21:04.488421 		 Processing Data (JD_2023-10-5_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_2.0_4.0.pkl
+2024-06-21 10:21:09.968441 		 Processing Data (JD_2023-10-5_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_2.0_8.0.pkl
+2024-06-21 10:21:10.422208 		 Processing Data (JD_2023-10-5_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_16.0.pkl
+2024-06-21 10:21:10.428127 		 Processing Data (JD_2023-10-5_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_1.0_8.0.pkl
+2024-06-21 10:21:10.474053 		 Processing Data (JD_2023-10-5_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_1.0.pkl
+2024-06-21 10:21:10.495738 		 Processing Data (JD_2023-10-5_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_1.0_4.0.pkl
+2024-06-21 10:21:10.589789 		 Processing Data (JD_2023-10-5_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_16.0_32.0.pkl
+2024-06-21 10:21:10.755804 		 Processing Data (JD_2023-10-5_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_8.0.pkl
+2024-06-21 10:21:10.879196 		 Processing Data (JD_2023-10-5_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_2.0_16.0.pkl
+2024-06-21 10:21:10.954966 		 Processing Data (JD_2023-10-5_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_4.0_8.0.pkl
+2024-06-21 10:21:11.037877 		 Processing Data (JD_2023-10-5_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_1.0_2.0.pkl
+2024-06-21 10:21:11.178987 		 Processing Data (JD_2023-10-5_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_4.0_32.0.pkl
+2024-06-21 10:21:13.993546 		 Processing Data (JD_2023-10-5_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_4.0_16.0.pkl
+2024-06-21 10:21:14.043988 		 Processing Data (JD_2023-10-5_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_8.0_16.0.pkl
+2024-06-21 10:21:14.137810 		 Processing Data (JD_2023-10-5_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_1.0_32.0.pkl
+2024-06-21 10:21:14.271846 		 Processing Data (JD_2023-10-5_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_32.0.pkl
+2024-06-21 10:21:14.393926 		 Processing Data (JD_2023-10-5_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_8.0_32.0.pkl
+2024-06-21 10:21:14.443537 		 Processing Data (JD_2023-10-5_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_2.0.pkl
+2024-06-21 10:21:14.591062 		 Processing Data (JD_2023-10-5_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_0.5_4.0.pkl
+2024-06-21 10:21:14.661517 		 Processing Data (JD_2023-10-5_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-5_1.0_16.0.pkl
+2024-06-21 10:25:29.494428 		 Plotting Backazimuth (JD_2023-10-6_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_1.0.png
+-----------------------------------NEW RUN-----------------------------------
+2024-06-21 10:26:12.341795 		 Loading and Filtering Data (JD_2023-10-7_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.342637 		 Loading and Filtering Data (JD_2023-10-7_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.342655 		 Loading and Filtering Data (JD_2023-10-7_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.343994 		 Loading and Filtering Data (JD_2023-10-7_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.344108 		 Loading and Filtering Data (JD_2023-10-7_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.344124 		 Loading and Filtering Data (JD_2023-10-7_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.345332 		 Loading and Filtering Data (JD_2023-10-7_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.345343 		 Loading and Filtering Data (JD_2023-10-7_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.345392 		 Loading and Filtering Data (JD_2023-10-7_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.347133 		 Loading and Filtering Data (JD_2023-10-7_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.347134 		 Loading and Filtering Data (JD_2023-10-7_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.347254 		 Loading and Filtering Data (JD_2023-10-7_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.347928 		 Loading and Filtering Data (JD_2023-10-7_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.348473 		 Loading and Filtering Data (JD_2023-10-7_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.349029 		 Loading and Filtering Data (JD_2023-10-7_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.349555 		 Loading and Filtering Data (JD_2023-10-7_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.350115 		 Loading and Filtering Data (JD_2023-10-7_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.350622 		 Loading and Filtering Data (JD_2023-10-7_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.351139 		 Loading and Filtering Data (JD_2023-10-7_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.351757 		 Loading and Filtering Data (JD_2023-10-7_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:12.352173 		 Loading and Filtering Data (JD_2023-10-7_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 10:26:40.499178 		 Processing Data (JD_2023-10-7_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_2.0.pkl
+2024-06-21 10:26:41.429456 		 Processing Data (JD_2023-10-7_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_4.0_32.0.pkl
+2024-06-21 10:26:41.500328 		 Processing Data (JD_2023-10-7_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_1.0_16.0.pkl
+2024-06-21 10:26:46.144539 		 Processing Data (JD_2023-10-7_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_1.0.pkl
+2024-06-21 10:26:47.022461 		 Processing Data (JD_2023-10-7_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_4.0_16.0.pkl
+2024-06-21 10:26:47.489452 		 Processing Data (JD_2023-10-7_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_1.0_4.0.pkl
+2024-06-21 10:26:47.531206 		 Processing Data (JD_2023-10-7_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_8.0_16.0.pkl
+2024-06-21 10:26:47.558771 		 Processing Data (JD_2023-10-7_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_32.0.pkl
+2024-06-21 10:26:47.651461 		 Processing Data (JD_2023-10-7_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_16.0_32.0.pkl
+2024-06-21 10:26:47.761218 		 Processing Data (JD_2023-10-7_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_1.0_32.0.pkl
+2024-06-21 10:26:47.885112 		 Processing Data (JD_2023-10-7_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_1.0_2.0.pkl
+2024-06-21 10:26:47.969599 		 Processing Data (JD_2023-10-7_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_4.0.pkl
+2024-06-21 10:26:48.080188 		 Processing Data (JD_2023-10-7_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_4.0_8.0.pkl
+2024-06-21 10:26:48.172257 		 Processing Data (JD_2023-10-7_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_8.0_32.0.pkl
+2024-06-21 10:26:48.629686 		 Processing Data (JD_2023-10-7_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_16.0.pkl
+2024-06-21 10:26:50.193883 		 Processing Data (JD_2023-10-7_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_2.0_16.0.pkl
+2024-06-21 10:26:50.435079 		 Processing Data (JD_2023-10-7_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_0.5_8.0.pkl
+2024-06-21 10:26:50.489483 		 Processing Data (JD_2023-10-7_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_1.0_8.0.pkl
+2024-06-21 10:26:50.542871 		 Processing Data (JD_2023-10-7_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_2.0_4.0.pkl
+2024-06-21 10:26:50.637535 		 Processing Data (JD_2023-10-7_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_2.0_8.0.pkl
+2024-06-21 10:26:50.935271 		 Processing Data (JD_2023-10-7_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-7_2.0_32.0.pkl
+2024-06-21 10:27:15.346623 		 Plotting Backazimuth (JD_2023-10-5_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_1.0.png
+2024-06-21 10:29:48.817794 		 Plotting Backazimuth (JD_2023-10-6_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_1.0_2.0.png
+2024-06-21 10:31:20.124784 		 Plotting Backazimuth (JD_2023-10-7_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_1.0.png
+2024-06-21 10:33:06.749080 		 Plotting Backazimuth (JD_2023-10-5_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_1.0_2.0.png
+2024-06-21 10:34:11.018672 		 Plotting Backazimuth (JD_2023-10-6_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_2.0.png
+2024-06-21 10:35:41.583942 		 Plotting Backazimuth (JD_2023-10-7_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_1.0_2.0.png
+2024-06-21 10:38:28.630392 		 Plotting Backazimuth (JD_2023-10-6_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_2.0_4.0.png
+2024-06-21 10:39:20.936440 		 Plotting Backazimuth (JD_2023-10-5_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_2.0.png
+2024-06-21 10:39:52.794529 		 Plotting Backazimuth (JD_2023-10-7_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_2.0.png
+2024-06-21 10:44:01.906901 		 Plotting Backazimuth (JD_2023-10-5_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_2.0_4.0.png
+2024-06-21 10:45:12.403984 		 Plotting Backazimuth (JD_2023-10-7_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_2.0_4.0.png
+2024-06-21 10:47:06.790597 		 Plotting Backazimuth (JD_2023-10-6_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_1.0_4.0.png
+2024-06-21 10:51:27.701742 		 Plotting Backazimuth (JD_2023-10-6_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_4.0.png
+2024-06-21 10:53:27.224935 		 Plotting Backazimuth (JD_2023-10-7_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_1.0_4.0.png
+2024-06-21 10:55:49.756064 		 Plotting Backazimuth (JD_2023-10-6_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_4.0_8.0.png
+2024-06-21 10:56:22.558999 		 Plotting Backazimuth (JD_2023-10-5_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_1.0_4.0.png
+2024-06-21 10:58:14.152533 		 Plotting Backazimuth (JD_2023-10-7_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_4.0.png
+2024-06-21 11:02:09.805942 		 Plotting Backazimuth (JD_2023-10-7_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_4.0_8.0.png
+2024-06-21 11:04:36.820404 		 Plotting Backazimuth (JD_2023-10-5_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_4.0.png
+2024-06-21 11:07:28.755861 		 Plotting Backazimuth (JD_2023-10-5_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_4.0_8.0.png
+2024-06-21 11:13:22.273910 		 Plotting Backazimuth (JD_2023-10-6_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_2.0_8.0.png
+2024-06-21 11:21:54.760438 		 Plotting Backazimuth (JD_2023-10-6_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_1.0_8.0.png
+2024-06-21 11:23:50.316256 		 Plotting Backazimuth (JD_2023-10-7_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_2.0_8.0.png
+2024-06-21 11:26:13.354910 		 Plotting Backazimuth (JD_2023-10-6_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_8.0.png
+2024-06-21 11:31:00.781663 		 Plotting Backazimuth (JD_2023-10-6_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_8.0_16.0.png
+2024-06-21 11:31:33.087494 		 Plotting Backazimuth (JD_2023-10-5_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_2.0_8.0.png
+2024-06-21 11:32:16.937503 		 Plotting Backazimuth (JD_2023-10-7_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_1.0_8.0.png
+2024-06-21 11:35:00.233188 		 Plotting Backazimuth (JD_2023-10-7_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_8.0.png
+2024-06-21 11:38:19.477866 		 Plotting Backazimuth (JD_2023-10-7_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_8.0_16.0.png
+2024-06-21 11:43:19.577837 		 Plotting Backazimuth (JD_2023-10-5_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_1.0_8.0.png
+2024-06-21 11:48:22.459246 		 Plotting Backazimuth (JD_2023-10-5_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_8.0.png
+2024-06-21 12:03:13.656480 		 Plotting Backazimuth (JD_2023-10-5_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_8.0_16.0.png
+2024-06-21 12:05:57.032724 		 Plotting Backazimuth (JD_2023-10-6_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_4.0_16.0.png
+2024-06-21 12:12:08.131534 		 Plotting Backazimuth (JD_2023-10-7_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_4.0_16.0.png
+2024-06-21 12:23:34.273851 		 Plotting Backazimuth (JD_2023-10-6_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_2.0_16.0.png
+2024-06-21 12:31:26.100760 		 Plotting Backazimuth (JD_2023-10-7_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_2.0_16.0.png
+2024-06-21 12:31:43.386228 		 Plotting Backazimuth (JD_2023-10-6_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_1.0_16.0.png
+2024-06-21 12:35:55.096211 		 Plotting Backazimuth (JD_2023-10-6_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_16.0.png
+2024-06-21 12:37:26.593510 		 Plotting Backazimuth (JD_2023-10-7_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_1.0_16.0.png
+2024-06-21 12:41:00.645732 		 Plotting Backazimuth (JD_2023-10-6_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_16.0_32.0.png
+2024-06-21 12:52:56.383522 		 Plotting Backazimuth (JD_2023-10-7_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_16.0_32.0.png
+2024-06-21 12:53:19.315758 		 Plotting Backazimuth (JD_2023-10-7_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_16.0.png
+2024-06-21 12:53:51.934262 		 Plotting Backazimuth (JD_2023-10-5_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_4.0_16.0.png
+2024-06-21 13:16:39.190215 		 Plotting Backazimuth (JD_2023-10-5_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_2.0_16.0.png
+2024-06-21 13:23:48.398091 		 Plotting Backazimuth (JD_2023-10-5_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_16.0.png
+2024-06-21 13:31:10.346335 		 Plotting Backazimuth (JD_2023-10-5_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_1.0_16.0.png
+2024-06-21 13:34:14.360304 		 Plotting Backazimuth (JD_2023-10-5_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_16.0_32.0.png
+2024-06-21 13:49:48.188376 		 Plotting Backazimuth (JD_2023-10-6_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_8.0_32.0.png
+2024-06-21 14:05:25.892991 		 Plotting Backazimuth (JD_2023-10-7_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_8.0_32.0.png
+-----------------------------------NEW RUN-----------------------------------
+2024-06-21 14:16:28.266111 		 Loading and Filtering Data (JD_2023-10-8_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.266983 		 Loading and Filtering Data (JD_2023-10-8_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.266989 		 Loading and Filtering Data (JD_2023-10-8_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.268173 		 Loading and Filtering Data (JD_2023-10-8_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.268184 		 Loading and Filtering Data (JD_2023-10-8_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.268219 		 Loading and Filtering Data (JD_2023-10-8_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.269237 		 Loading and Filtering Data (JD_2023-10-8_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.269240 		 Loading and Filtering Data (JD_2023-10-8_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.269311 		 Loading and Filtering Data (JD_2023-10-8_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.270815 		 Loading and Filtering Data (JD_2023-10-8_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.270830 		 Loading and Filtering Data (JD_2023-10-8_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.270857 		 Loading and Filtering Data (JD_2023-10-8_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.272165 		 Loading and Filtering Data (JD_2023-10-8_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.272188 		 Loading and Filtering Data (JD_2023-10-8_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.272187 		 Loading and Filtering Data (JD_2023-10-8_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.274047 		 Loading and Filtering Data (JD_2023-10-8_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.274050 		 Loading and Filtering Data (JD_2023-10-8_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.274050 		 Loading and Filtering Data (JD_2023-10-8_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.274084 		 Loading and Filtering Data (JD_2023-10-8_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.274851 		 Loading and Filtering Data (JD_2023-10-8_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.276106 		 Loading and Filtering Data (JD_2023-10-8_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.284809 		 Loading and Filtering Data (TOP_2023-10-5_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.284973 		 Loading and Filtering Data (TOP_2023-10-5_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.289334 		 Loading and Filtering Data (TOP_2023-10-5_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.289996 		 Loading and Filtering Data (TOP_2023-10-5_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.291597 		 Loading and Filtering Data (TOP_2023-10-5_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.291662 		 Loading and Filtering Data (TOP_2023-10-5_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.292418 		 Loading and Filtering Data (TOP_2023-10-5_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.293206 		 Loading and Filtering Data (TOP_2023-10-5_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.293763 		 Loading and Filtering Data (TOP_2023-10-5_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.294432 		 Loading and Filtering Data (TOP_2023-10-5_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.295338 		 Loading and Filtering Data (TOP_2023-10-5_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.295805 		 Loading and Filtering Data (TOP_2023-10-5_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.296469 		 Loading and Filtering Data (TOP_2023-10-5_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.297178 		 Loading and Filtering Data (TOP_2023-10-5_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.297761 		 Loading and Filtering Data (TOP_2023-10-5_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.298328 		 Loading and Filtering Data (TOP_2023-10-5_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.299086 		 Loading and Filtering Data (TOP_2023-10-5_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.299703 		 Loading and Filtering Data (TOP_2023-10-5_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.300357 		 Loading and Filtering Data (TOP_2023-10-5_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.300817 		 Loading and Filtering Data (TOP_2023-10-5_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:16:28.301490 		 Loading and Filtering Data (TOP_2023-10-5_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/mseed
+2024-06-21 14:17:02.125650 		 Processing Data (JD_2023-10-8_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_4.0_8.0.pkl
+2024-06-21 14:17:07.865904 		 Processing Data (JD_2023-10-8_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_1.0_4.0.pkl
+2024-06-21 14:17:08.197611 		 Processing Data (JD_2023-10-8_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_32.0.pkl
+2024-06-21 14:17:08.273270 		 Processing Data (JD_2023-10-8_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_2.0_32.0.pkl
+2024-06-21 14:17:08.390077 		 Processing Data (JD_2023-10-8_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_8.0_16.0.pkl
+2024-06-21 14:17:08.443726 		 Processing Data (JD_2023-10-8_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_2.0_16.0.pkl
+2024-06-21 14:17:08.455055 		 Processing Data (JD_2023-10-8_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_1.0_8.0.pkl
+2024-06-21 14:17:08.521590 		 Processing Data (JD_2023-10-8_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_8.0_32.0.pkl
+2024-06-21 14:17:08.632025 		 Processing Data (JD_2023-10-8_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_16.0_32.0.pkl
+2024-06-21 14:17:08.632838 		 Processing Data (JD_2023-10-8_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_4.0.pkl
+2024-06-21 14:17:08.661409 		 Processing Data (JD_2023-10-8_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_4.0_16.0.pkl
+2024-06-21 14:17:08.672908 		 Processing Data (JD_2023-10-8_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_8.0.pkl
+2024-06-21 14:17:08.680974 		 Processing Data (JD_2023-10-8_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_1.0_2.0.pkl
+2024-06-21 14:17:08.843442 		 Processing Data (JD_2023-10-8_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_1.0_32.0.pkl
+2024-06-21 14:17:08.851825 		 Processing Data (JD_2023-10-8_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_4.0_32.0.pkl
+2024-06-21 14:17:08.899576 		 Processing Data (JD_2023-10-8_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_2.0.pkl
+2024-06-21 14:17:08.941566 		 Processing Data (JD_2023-10-8_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_2.0_4.0.pkl
+2024-06-21 14:17:08.943695 		 Processing Data (JD_2023-10-8_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_1.0_16.0.pkl
+2024-06-21 14:17:08.994484 		 Processing Data (JD_2023-10-8_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_16.0.pkl
+2024-06-21 14:17:09.212559 		 Processing Data (JD_2023-10-8_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_0.5_1.0.pkl
+2024-06-21 14:17:09.397528 		 Processing Data (JD_2023-10-8_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/data/processed/processed_output_JD_2023-10-8_2.0_8.0.pkl
+2024-06-21 14:17:33.815336 		 Completed Processing
+2024-06-21 14:21:41.519333 		 Plotting Backazimuth (JD_2023-10-8_0.5_1.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_1.0.png
+2024-06-21 14:25:54.871604 		 Plotting Backazimuth (JD_2023-10-6_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_4.0_32.0.png
+2024-06-21 14:26:02.128724 		 Plotting Backazimuth (JD_2023-10-8_1.0_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_1.0_2.0.png
+2024-06-21 14:27:25.110845 		 Plotting Backazimuth (JD_2023-10-7_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_4.0_32.0.png
+2024-06-21 14:30:23.057035 		 Plotting Backazimuth (JD_2023-10-8_0.5_2.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_2.0.png
+2024-06-21 14:34:42.770507 		 Plotting Backazimuth (JD_2023-10-8_2.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_2.0_4.0.png
+2024-06-21 14:37:05.908873 		 Plotting Backazimuth (JD_2023-10-6_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_2.0_32.0.png
+2024-06-21 14:43:21.942600 		 Plotting Backazimuth (JD_2023-10-8_1.0_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_1.0_4.0.png
+2024-06-21 14:47:43.622266 		 Plotting Backazimuth (JD_2023-10-8_0.5_4.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_4.0.png
+2024-06-21 14:49:03.709229 		 Plotting Backazimuth (JD_2023-10-6_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_0.5_32.0.png
+2024-06-21 14:49:05.851881 		 Plotting Backazimuth (JD_2023-10-7_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_2.0_32.0.png
+2024-06-21 14:51:51.844647 		 Plotting Backazimuth (JD_2023-10-8_4.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_4.0_8.0.png
+2024-06-21 14:52:12.702548 		 Plotting Backazimuth (JD_2023-10-6_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-6_1.0_32.0.png
+2024-06-21 14:52:14.523309 		 Completed Processing
+2024-06-21 15:01:03.792170 		 Plotting Backazimuth (JD_2023-10-5_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_8.0_32.0.png
+2024-06-21 15:04:45.204911 		 Plotting Backazimuth (JD_2023-10-7_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_1.0_32.0.png
+2024-06-21 15:07:46.765258 		 Plotting Backazimuth (JD_2023-10-7_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-7_0.5_32.0.png
+2024-06-21 15:07:50.150239 		 Completed Processing
+2024-06-21 15:09:22.115825 		 Plotting Backazimuth (JD_2023-10-8_2.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_2.0_8.0.png
+2024-06-21 15:18:59.299907 		 Plotting Backazimuth (JD_2023-10-8_1.0_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_1.0_8.0.png
+2024-06-21 15:22:41.341550 		 Plotting Backazimuth (JD_2023-10-8_0.5_8.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_8.0.png
+2024-06-21 15:27:18.871306 		 Plotting Backazimuth (JD_2023-10-8_8.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_8.0_16.0.png
+2024-06-21 15:59:49.063363 		 Plotting Backazimuth (JD_2023-10-5_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_2.0_32.0.png
+2024-06-21 16:01:52.819229 		 Plotting Backazimuth (JD_2023-10-8_4.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_4.0_16.0.png
+2024-06-21 16:06:50.940181 		 Plotting Backazimuth (JD_2023-10-5_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_4.0_32.0.png
+2024-06-21 16:19:30.128034 		 Plotting Backazimuth (JD_2023-10-8_2.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_2.0_16.0.png
+2024-06-21 16:22:17.250891 		 Plotting Backazimuth (JD_2023-10-5_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_0.5_32.0.png
+2024-06-21 16:28:00.862252 		 Plotting Backazimuth (JD_2023-10-8_1.0_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_1.0_16.0.png
+2024-06-21 16:32:45.690727 		 Plotting Backazimuth (JD_2023-10-8_0.5_16.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_16.0.png
+2024-06-21 16:38:03.247637 		 Plotting Backazimuth (JD_2023-10-8_16.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_16.0_32.0.png
+2024-06-21 16:53:18.768719 		 Plotting Backazimuth (JD_2023-10-5_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-5_1.0_32.0.png
+2024-06-21 16:53:22.111039 		 Completed Processing
+2024-06-21 17:47:26.998474 		 Plotting Backazimuth (JD_2023-10-8_8.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_8.0_32.0.png
+2024-06-21 18:20:03.229615 		 Plotting Backazimuth (JD_2023-10-8_4.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_4.0_32.0.png
+2024-06-21 18:37:19.512692 		 Plotting Backazimuth (JD_2023-10-8_2.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_2.0_32.0.png
+2024-06-21 18:44:48.292841 		 Plotting Backazimuth (JD_2023-10-8_1.0_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_1.0_32.0.png
+2024-06-21 18:47:44.150751 		 Plotting Backazimuth (JD_2023-10-8_0.5_32.0)
+    /bsuhome/madelinehunt/reynolds-creek/figures/backaz_JD_2023-10-8_0.5_32.0.png
+2024-06-21 18:47:47.025238 		 Completed Processing
