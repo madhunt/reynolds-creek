@@ -161,7 +161,7 @@ def plot_backaz(output, path_home, subtitle_str, file_str=None):
     ax.set_xlabel("Mountain Time (Local)")
     ax.set_xlim([output["Time"].min(), output["Time"].max()])
     hours_num = (output["Time"].max() - output["Time"].min()).total_seconds() / 3600
-    tick_spacing = int(hours_num // 15) # make x-axis look nice (good number of ticks)
+    tick_spacing = int(np.ceil((hours_num / 15))) # make x-axis look nice (good number of ticks)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=tick_spacing))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
     fig.autofmt_xdate()

@@ -15,8 +15,8 @@ def load_data(path_data, array_str=None,
         Assigns coordinates to all traces. If specified, filters data. If specified, 
         only returns a subset of gems (otherwise, returns full array).
     INPUTS
-        path_data : str : Path to data folder. Should contain all miniseed files 
-            under 'mseed' dir, and coordinates in .csv file(s).
+        path_data : str : Path to data folder. Should contain miniseed files. 
+            Coordinates are stored up one directory under gps/{filename}/csv.
         gem_include : list of str : Optional. If specified, should list Gem station
             names to include in processing. Mutually exclusive with gem_exclude.
         gem_exclude : list of str : Optional. If specified, should list Gem station

@@ -31,7 +31,6 @@ def main(path_home, process=False,
         print("    "+path_data, file=f)
 
     # load data
-    #TODO option for highpass or lowpass only
     data = utils.load_data(path_data, array_str=array_str,
                            gem_include=gem_include, gem_exclude=gem_exclude, 
                            time_start=time_start, time_stop=time_stop,
@@ -61,7 +60,7 @@ def main(path_home, process=False,
 
     # plot backaz time series
     plot_utils.plot_backaz(output, path_home, 
-                            f"Filtered {freqmin} to {freqmax} Hz", file_str)
+                            f"{array_str} Array, Filtered {freqmin} to {freqmax} Hz", file_str)
     
     return
 
