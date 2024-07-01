@@ -1,0 +1,9 @@
+Job Name              = 
+Time Submitted        = Tue Jun 25 11:37:21 MDT 2024
+Hostname              = cpu105
+PWD                   = /bsuhome/madelinehunt/reynolds-creek/code
+Num Nodes Allocated   = 1
+Num Tasks Allocated   = 1
+/bsuhome/madelinehunt/reynolds-creek/code/plot_utils.py:162: UserWarning: Attempting to set identical low and high xlims makes transformation singular; automatically expanding.
+  ax.set_xlim([output["Time"].min(), output["Time"].max()])
+slurmstepd: error: *** JOB 1133836 ON cpu105 CANCELLED AT 2024-06-26T02:37:18 DUE TO TIME LIMIT ***
