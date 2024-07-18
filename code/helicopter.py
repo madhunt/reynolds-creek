@@ -3,7 +3,7 @@
 # code to import helicopter data and overplot with infrasound data
 
 import plot_utils, utils
-import argparse, math, os, datetime, glob, pytz
+import argparse, math, os, datetime, glob, pytz, itertools
 import numpy as np
 import pandas as pd
 import scipy as sci
@@ -69,86 +69,71 @@ def main(path_home):
             all_data.to_pickle(os.path.join(path_home, 'data', 'test', f'{array_str}_az_backaz.pkl'))
         return
     
-    # TEST data including "true" heli coords
-    top = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'TOP_az_backaz.pkl'))
-    jdna = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'JDNA_az_backaz.pkl'))
-    jdnb = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'JDNB_az_backaz.pkl'))
-    jdsa = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'JDSA_az_backaz.pkl'))
-    jdsb = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'JDSB_az_backaz.pkl'))
+    def load_ray_data(array_str, date_list, freq_str):
+        # load processed infrasound data
+        path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
+                                    "reynolds-creek", "data", "processed")
+        output = pd.DataFrame()
+        for date_str in date_list:
+            file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
+            output_tmp = pd.read_pickle(file)
+            output = pd.concat([output, output_tmp])
+        
+        # FIXME just load data of interest during a time when helicopter is clear
+        filt = lambda arr: arr[(arr['Time'] > '2023-10-07T17:00:00') & (arr['Time'] < '2023-10-07T18:30:00')]
+        output = filt(output).set_index('Time')
 
+        # add column for angle (0 deg at x-axis, 90 deg at y-axis)
+        output['Angle'] = (-1 * output['Backaz'] + 90)%360
 
+        # get start points
+        lat, lon, elv = station_coords_avg(path_home, array_str)
+        p_start = np.array([lat, lon])
 
-    # (1) get start coords and angles for each point from each array
-    top_lat, top_lon, top_elv = station_coords_avg(path_home, 'TOP')
-    jdna_lat, jdna_lon, jdna_elv = station_coords_avg(path_home, 'JDNA')
-    jdnb_lat, jdnb_lon, jdnb_elv = station_coords_avg(path_home, 'JDNB')
+        return output, p_start
 
+    array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
 
-    # these are line segments, not lines, since they only go in one direction
-    # (2) so, calculate a reasonable end point for each line (max distance we'd accept intersection)
+    # calculate all intersections between each 2 arrays
+    all_ints = pd.DataFrame()
+    for (arr1_str, arr2_str) in itertools.combinations(array_list, 2):
+        arr1, p1 = load_ray_data(arr1_str, date_list, freq_str)
+        arr2, p2 = load_ray_data(arr2_str, date_list, freq_str)
 
+        #TODO
+        ## change from lat,lon to x,y in km
+        #p1_km = np.array([0, 0])
+        #p2_km = util_geo_km(orig_lon=p1[1], orig_lat=p1[0], lon=p2[1], lat=p2[0])
 
-    # (3) calculate if the line segments intersect
-    # if 4/5 intersect, that still seems valid.... think about this
+        # calculate intersection
+        int_pts = arr1['Backaz'].combine(arr2['Backaz'], (lambda a1, a2: intersection(p1, a1, p2, a2)))
 
-
-    # (4) calculate least-squares best fit intersection point
-
-
-
-
-    # let's try top and jdna first
-    # set top as reference origin
-
-    lat0, lon0, elv0 = station_coords_avg(path_home, 'TOP')
-    lat1, lon1, elv1 = station_coords_avg(path_home, 'JDNA')
-
-    # ref coordinates of TOP
-    x0 = 0
-    y0 = 0
-    # coords of jdna rel to top
-    x1, y1 = util_geo_km(lon0, lat0, lon1, lat1)
-
-    int_pts = pd.DataFrame()    
-    #FIXME cant use tan here these are backaz!!!!!!!!!!!!! NEED TO CONVERT 
-    int_pts['m_top'] = np.tan((-1*top['Backaz']+90)%360)
-    int_pts['b_top'] = y0 - int_pts['m_top']*x0
-
-    int_pts['m_jdna'] = np.tan((-1*jdna['Backaz']+90)%360)
-    int_pts['b_jdna'] = y1 - int_pts['m_jdna']*x1
-
-    int_pts['x_int'] = (int_pts['b_jdna'] - int_pts['b_top']) / (int_pts['m_top'] / int_pts['m_jdna'])
-    int_pts['y_int'] = int_pts['m_top'] * int_pts['x_int'] + int_pts['b_top']
-
-    # remove huge outliers
-    #int_pts = int_pts[(int_pts['x_int'] < int_pts['x_int'].quantile(0.90)) & 
-                      #(int_pts['y_int'] < int_pts['y_int'].quantile(0.90))]
+        # change back to lon,lat
+        all_ints[f'{arr1_str}_{arr2_str}'] = int_pts
     
-    # convert back to lat lon
-    int_pts[['lon_int', 'lat_int']] = pd.DataFrame([util_lon_lat(lon0, lat0, x, y) for x, y in zip(int_pts['x_int'], int_pts['y_int'])], index=int_pts.index)
+    # now find median intersection point
+    median_ints = pd.DataFrame()
+    median_ints['Lat'] = all_ints.apply(lambda col: [coord[0] for coord in col]).median(axis=1)
+    median_ints['Lon'] = all_ints.apply(lambda col: [coord[1] for coord in col]).median(axis=1)
 
     # true coords
     heli_coords = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'heli_coords.pkl'))
 
-
-    # some test plots
+    # test plot
     fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True)
 
-    ax[0].plot(int_pts.index, int_pts['lon_int'], 'ro')
-    ax[0].plot(heli_coords.index, heli_coords['Longitude'], 'k-')
+    ax[0].plot(median_ints.index, median_ints['Lat'], 'ro')
+    ax[0].plot(heli_coords.index, heli_coords['Latitude'], 'k-')
+    ax[1].plot(median_ints.index, median_ints['Lon'], 'ro')
+    ax[1].plot(heli_coords.index, heli_coords['Longitude'], 'k-')
 
-    ax[1].plot(int_pts.index, int_pts['lat_int'], 'ro')
-    ax[1].plot(heli_coords.index, heli_coords['Latitude'], 'k-')
-
-    ax[0].set_ylim([-116.5, -117])
-    ax[1].set_ylim([42.8, 43.4])
+    #ax[0].set_ylim([-116.5, -117])
+    #ax[1].set_ylim([42.8, 43.4])
 
     plt.show()
-
-    print(int_pts)
-
-
     
+    print(median_ints)
+
 
 
 
@@ -301,6 +286,42 @@ def helicoords_to_az(path_home, data, array_str):
 
     return data
     
+def intersection(p1, a1, p2, a2):
+    '''
+    Calculates intersection point between two rays.
+    INPUTS
+        l1 : np array, 2x1 : Coordinates (x,y) for start point of ray 1.
+        a1 : float : Angle of direction of ray 1 (0 deg on x-axis, 90 deg on y-axis).
+        l2 : np array, 2x1 : Coordinates (x,y) for start point of ray 2.
+        a2 : float : Angle of direction of ray 2.
+    RETURNS
+        int_pt : np array, 2x1 : Coordinates (x,y) of intersection point. 
+            Returns [NaN, NaN] if there is no intersection; e.g. if intersection 
+            occurs "behind" ray start points or if rays are parallel. 
+    '''
+    # create matrix of direction unit vectors
+    D = np.array([[np.cos(np.radians(a1)), -1*np.cos(np.radians(a2))],
+                      [np.sin(np.radians(a1)), -1*np.sin(np.radians(a2))]])
+    # create vector of difference in start coords (p2x-p1x, p2y-p1y)
+    P = np.array([p2[0] - p1[0],
+                  p2[1] - p1[1]])
+
+    # solve system of equations Dt=P
+    try:
+        t = np.linalg.solve(D, P)
+    except:
+        # matrix is singular (rays are parallel)
+        return np.array([np.nan, np.nan])
+
+    # see if intersection point is actually along rays
+    if t[0]<0 or t[1]<0:
+        # if intersection is "behind" rays, return nans
+        return np.array([np.nan, np.nan])
+        
+    # calculate intersection point
+    int_pt = np.array([p1[0]+D[0,0]*t[0],
+                       p1[1]+D[1,0]*t[0]])
+    return int_pt
 
 if __name__ == "__main__":
     
@@ -308,5 +329,5 @@ if __name__ == "__main__":
     path_curr = os.path.dirname(os.path.realpath(__file__))
     path_home = os.path.abspath(os.path.join(path_curr, '..'))
 
-    #main(path_home=path_home)
-    basic_main(path_home=path_home)
+    main(path_home=path_home)
+    #basic_main(path_home=path_home)
