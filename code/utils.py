@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from obspy.core.util import AttribDict
 
-def load_data(path_data, array_str=None,
+def load_data(path_data, path_coords, array_str=None,
               gem_include=None, gem_exclude=None,
               time_start=None, time_stop=None,
               freqmin=None, freqmax=None):
@@ -34,18 +34,18 @@ def load_data(path_data, array_str=None,
     '''
     # (1) read in the data
     # paths to mseed and coordinates
-    path_mseed = glob.glob(os.path.join(path_data, f"*{array_str}*.mseed"))
-    path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" )) # FIXME
+    path_mseed = os.path.join(path_data, f"*{array_str}*.mseed")
+    #path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" )) # FIXME
 
     # import data as obspy stream
-    #data = obspy.read(path_mseed)
-    data = obspy.Stream()
-    for path in path_mseed:
-        tmp_data = obspy.read(path)
-        for tr in tmp_data:
-            # save path information for each trace
-            tr.stats['path'] = path
-        data += tmp_data
+    data = obspy.read(path_mseed)
+    #data = obspy.Stream()
+    #for path in path_mseed:
+    #    tmp_data = obspy.read(path)
+    #    for tr in tmp_data:
+    #        # save path information for each trace
+    #        tr.stats['path'] = path
+    #    data += tmp_data
 
     # (2) bandpass filter data if desired
     if freqmin != None and freqmax != None:
@@ -57,24 +57,22 @@ def load_data(path_data, array_str=None,
     # merge dates (discard overlaps and leave gaps)
     data = data.merge(method=0)
     # only keep data in the time range of interest
-    if time_start != None:
-        data = [trace for trace in data.traces if 
-                (trace.stats.starttime <= time_start) and (trace.stats.endtime >= time_stop)]
-        # convert back to obspy stream
-        data = obspy.Stream(traces=data)
+    data = data.trim(starttime=time_start, endtime=time_stop, keep_empty_traces=False)
+    #if time_start != None:
+    #    data = obspy.Stream([trace for trace in data.traces if 
+    #            (trace.stats.starttime <= time_start) and (trace.stats.endtime >= time_stop)])
     
     # (4) add coordinates to traces
     # import coordinates
-    coords = pd.DataFrame()
-    for file in path_coords:
-        coords = pd.concat([coords, pd.read_csv(file)])
+    #coords = pd.DataFrame()
+    #for file in path_coords:
+    #    coords = pd.concat([coords, pd.read_csv(file)])
+    coords = pd.read_csv(path_coords)
     coords["Name"] = coords["Name"].astype(str) # SN of gem
     
     # get rid of any stations that don't have coordinates
-    data = [trace for trace in data.traces 
-                    if trace.stats['station'] in coords["Station"].to_list()]
-    # convert list back to obspy stream
-    data = obspy.Stream(traces=data)
+    data = obspy.Stream([trace for trace in data.traces 
+                    if trace.stats['station'] in coords["Station"].to_list()])
 
     # assign coordinates to stations
     for _, row in coords.iterrows():
@@ -88,13 +86,9 @@ def load_data(path_data, array_str=None,
     # (5) filter by gem station ID 
     # only use specified subset of gems
     if gem_include != None:
-        data_subset = [trace for trace in data.traces if trace.stats['station'] in gem_include]
-        data_subset = obspy.Stream(traces=data_subset)
-        data = data_subset
-    elif gem_exclude != None:
-        data_subset = [trace for trace in data.traces if trace.stats['station'] not in gem_exclude]
-        data_subset = obspy.Stream(traces=data_subset)
-        data = data_subset
+        data = obspy.Stream([trace for trace in data.traces if trace.stats['station'] in gem_include])
+    if gem_exclude != None:
+        data = obspy.Stream([trace for trace in data.traces if trace.stats['station'] not in gem_exclude])
 
     return data
 
