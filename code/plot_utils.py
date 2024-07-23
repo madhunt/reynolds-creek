@@ -120,7 +120,7 @@ def plot_slowness(output, path_home, id_str):
     return
 
 
-def plot_backaz(output, path_home, subtitle_str, file_str=None):
+def plot_backaz(output, path_home, subtitle_str, file_str=None, fig=None, ax=None):
     '''
     Plot backazimuth over time from output of array processing. 
     INPUTS:
@@ -145,7 +145,9 @@ def plot_backaz(output, path_home, subtitle_str, file_str=None):
     output = output[output["Slowness"].between(slow_min, slow_max)]
 
     # create figure
-    fig, ax = plt.subplots(1, 1, figsize=[7, 5], tight_layout=True)
+    if fig == None and ax ==None:
+        fig, ax = plt.subplots(1, 1, figsize=[7, 5], tight_layout=True)
+
     im = ax.scatter(output["Time"], output['Backaz'], c=output["Semblance"],
                     alpha=0.7, edgecolors='none', cmap='plasma',
                     vmin=min(output["Semblance"]), vmax=max(output["Semblance"]))
