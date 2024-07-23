@@ -14,62 +14,143 @@ import matplotlib.dates as mdates
 from obspy.signal.array_analysis import get_geometry
 from obspy.signal.util import util_geo_km, util_lon_lat
 import xmltodict
+import matplotlib.animation as animation
 
 def main(path_home):
 
-    date_list = ["2023-10-6", "2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
-    #array_str = "TOP"
+    date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
     freqmin = 24.0
     freqmax = 32.0
     freq_str = f"{freqmin}_{freqmax}"
 
-    def save_az_backaz():
-        # save pkls of heli az and calculated backaz for each array for specified time interval
-        array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
-        for array_str in array_list:
-            print(array_str)
-            # load in helicopter data
-            path_heli = os.path.join(path_home, "data", "helicopter")
-            data_heli = adsb_kml_to_df(path_heli)
+    array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
 
-            # convert heli coords to dist/azimuth from array
-            data_heli = helicoords_to_az(path_home, data_heli, array_str)
-
-            # load processed infrasound data
-            path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
-                                        "reynolds-creek", "data", "processed")
-            output = pd.DataFrame()
-            for date_str in date_list:
-                file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
-                output_tmp = pd.read_pickle(file)
-                output = pd.concat([output, output_tmp])
-            
-            filt = lambda arr: arr[(arr['Time'] > '2023-10-07T17:00:00') & (arr['Time'] < '2023-10-07T18:30:00')]
-            output = filt(output).set_index('Time')
-            data_heli = filt(data_heli).set_index('Time')
-
-            # get rid of weird duplicates
-            data_heli = data_heli[~data_heli.index.duplicated()]
-            # resample to every 30 s (same rate as output for 60s windows with 50% overlap)
-            win_len = 60
-            overlap = 0.5
-            spacing = int(win_len*overlap)
-            heli_resamp = data_heli.resample(f'{spacing}s').mean().interpolate()
-
-            # first time through, save heli lon/lat/alt as pkl
-            if array_str == "TOP":
-                print('saving heli coords')
-                heli_resamp.to_pickle(os.path.join(path_home, 'data', 'test', 'heli_coords.pkl'))
-
-            # concat with output to make df with 'true' dist/az and calc az
-            all_data = pd.concat([heli_resamp['Distance'], heli_resamp['Azimuth'], output], axis=1)#.dropna() 
-            all_data = all_data.rename(columns={'Distance': 'Heli Dist', 'Azimuth': 'Heli Az'})
-
-            print('saving azs')
-            all_data.to_pickle(os.path.join(path_home, 'data', 'test', f'{array_str}_az_backaz.pkl'))
-        return
+    # figure with all array backaz in subplots
+    #plot_backaz_heli(path_home, date_list, array_list, freq_str)
     
-    def load_ray_data(array_str, date_list, freq_str):
+
+    # calculate all intersections between each 2 arrays
+    all_ints = pd.DataFrame()
+    for (arr1_str, arr2_str) in itertools.combinations(array_list, 2):
+        arr1, p1 = load_ray_data(arr1_str, date_list, freq_str)
+        arr2, p2 = load_ray_data(arr2_str, date_list, freq_str)
+
+        # change from lat/lon to x,y in km
+        p1_km = np.array([0, 0])
+        p2_km = util_geo_km(orig_lon=p1[0], orig_lat=p1[1], lon=p2[0], lat=p2[1])
+
+        # calculate intersection (using angle, not backaz)
+        int_pts_km = arr1['Angle'].combine(arr2['Angle'], (lambda a1, a2: intersection(p1_km, a1, p2_km, a2)))
+        
+        # change back to lat/lon from km
+        int_pts = pd.DataFrame([util_lon_lat(p1[0], p1[1], km[0], km[1]) for km in int_pts_km], 
+                               columns=['Lon', 'Lat'], index=int_pts_km.index)
+
+        all_ints[f'{arr1_str}_{arr2_str} Lat'] = int_pts['Lat']#[col[1] for col in int_pts]
+        all_ints[f'{arr1_str}_{arr2_str} Lon'] = int_pts['Lon']#[col[0] for col in int_pts]
+    
+    # now find median intersection point
+    all_ints.index = int_pts.index
+    median_ints = pd.DataFrame(index=int_pts.index)
+    median_ints['Lat'] = all_ints.filter(regex='Lat').median(axis=1)
+    median_ints['Lon'] = all_ints.filter(regex='Lon').median(axis=1)
+
+    # load in true helicopter data
+    path_heli = os.path.join(path_home, "data", "helicopter")
+    data_heli = adsb_kml_to_df(path_heli)
+    data_heli = data_heli.set_index('Time')
+
+    
+    #############
+    filt = lambda arr: arr[(arr.index > '2023-10-07T17:02:00') & (arr.index < '2023-10-07T21:00:00')]
+    median_ints = filt(median_ints)
+    data_heli = filt(data_heli)
+    # resample data heli
+    data_heli = data_heli[~data_heli.index.duplicated(keep='first')]
+    data_heli = data_heli.resample('30s').nearest()
+    # get rid of outliers
+    median_ints = median_ints[~((median_ints['Lat'] > median_ints['Lat'].quantile(0.99)) | 
+                                (median_ints['Lat'] < median_ints['Lat'].quantile(0.01)) | 
+                                (median_ints['Lon'] > median_ints['Lon'].quantile(0.99)) | 
+                                (median_ints['Lon'] < median_ints['Lon'].quantile(0.01)) )]
+
+    
+    # scatterplot
+    fig, ax = plt.subplots(3, 1, tight_layout=True, height_ratios=[3,1,1])
+    ax[0].set_xlim([min(median_ints['Lon'].min(), data_heli['Longitude'].min()),
+                   max(median_ints['Lon'].max(), data_heli['Longitude'].max())])
+    ax[0].set_ylim([min(median_ints['Lat'].min(), data_heli['Latitude'].min()),
+                   max(median_ints['Lat'].max(), data_heli['Latitude'].max())])
+    # ax1 is timeseries
+    ax[1].plot(median_ints.index, median_ints['Lat'], 'ro')
+    ax[1].plot(data_heli.index, data_heli['Latitude'], 'k-', label='Actual')
+    ax[1].set_title('Latitude')
+    ax[2].plot(median_ints.index, median_ints['Lon'], 'ro')
+    ax[2].plot(data_heli.index, data_heli['Longitude'], 'k-', label='Actual')
+    ax[2].set_title('Longitude')
+    ax[1].sharex(ax[2])
+    ax[2].set_xlabel("Mountain Time (Local)")
+    ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
+    fig.autofmt_xdate()
+
+    graph1 = ax[0].scatter([], [], c='k', alpha=0.5, label='Actual')
+    graph2 = ax[0].scatter([], [], c='r', alpha=0.5, label='Triangulated')
+    v1 = ax[1].axvline(data_heli.index[0], ls='-', color='b', lw=1)
+    v2 = ax[2].axvline(data_heli.index[0], ls='-', color='b', lw=1)
+    ax[0].legend(loc='upper right')
+    def animate(i):
+        graph1.set_offsets(np.vstack((data_heli['Longitude'][:i+1], data_heli['Latitude'][:i+1])).T)
+        graph2.set_offsets(np.vstack((median_ints['Lon'][:i+1], median_ints['Lat'][:i+1])).T)
+        v1.set_xdata([data_heli.index[i], data_heli.index[i]])
+        v2.set_xdata([data_heli.index[i], data_heli.index[i]])
+        return graph1, graph2, v1, v2
+    ani = animation.FuncAnimation(fig, animate, repeat=True, interval=50, frames=(len(data_heli)-1))
+    #plt.show()
+    ani.save(os.path.join(path_home, "figures", f"heli_coords.gif"), dpi=200)#, writer=animation.PillowWriter(fps=30))
+
+
+
+    # timeseries plots
+    fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True, figsize=[8,5])
+
+    ax[0].plot(median_ints.index, median_ints['Lat'], 'ro')
+    ax[0].plot(data_heli['Time'], data_heli['Latitude'], 'k-', label='Actual')
+    ax[1].plot(median_ints.index, median_ints['Lon'], 'ro')
+    ax[1].plot(data_heli['Time'], data_heli['Longitude'], 'k-', label='Actual')
+
+    #ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=1))
+
+    ax[0].set_ylim([43.05, 43.17])
+    ax[1].set_ylim([-116.85,-116.70])
+    ax[0].set_xlim([datetime.datetime(2023, 10, 7, 9, 45, 0, tzinfo=pytz.timezone("US/Mountain")), 
+                datetime.datetime(2023, 10, 7, 11, 30, 0, tzinfo=pytz.timezone("US/Mountain"))])
+
+    ax[0].set_title("Latitude")
+    ax[1].set_title("Longitude")
+    ax[0].legend(loc='lower right')
+    ax[1].legend(loc='lower right')
+    ax[0].grid()
+    ax[1].grid()
+
+    # save figure
+    plt.savefig(os.path.join(path_home, "figures", f"heli_coords_comparison.png"), dpi=500)
+    plt.close()
+    return
+    
+
+
+def plot_backaz_heli(path_home, date_list, array_list, freq_str):
+    # load in helicopter data
+    path_heli = os.path.join(path_home, "data", "helicopter")
+    data_heli = adsb_kml_to_df(path_heli)
+
+
+    fig, ax = plt.subplots(5, 1, sharex=True, tight_layout=True, figsize=[14,9])
+
+    for i, array_str in enumerate(array_list):
+        # convert heli coords to dist/azimuth from array
+        data_heli = helicoords_to_az(path_home, data_heli, array_str)
+
         # load processed infrasound data
         path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
                                     "reynolds-creek", "data", "processed")
@@ -78,87 +159,28 @@ def main(path_home):
             file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
             output_tmp = pd.read_pickle(file)
             output = pd.concat([output, output_tmp])
-        
-        # FIXME just load data of interest during a time when helicopter is clear
-        filt = lambda arr: arr[(arr['Time'] > '2023-10-07T17:00:00') & (arr['Time'] < '2023-10-07T18:30:00')]
-        output = filt(output).set_index('Time')
 
-        # add column for angle (0 deg at x-axis, 90 deg at y-axis)
-        output['Angle'] = (-1 * output['Backaz'] + 90)%360
+        # plot processed data
+        fig, axi = plot_utils.plot_backaz(output=output, path_home=path_home, 
+                            subtitle_str=f"{array_str}", file_str=None,
+                            fig=fig, ax=ax[i])
+        # plot heli data
+        axi.plot(data_heli['Time'], data_heli['Azimuth'], '-', color='green', 
+                alpha=0.6, label='Helicopter Track')
+        axi.legend(loc='upper right')
+        axi.set_xlim([datetime.datetime(2023, 10, 7, 9, 0, 0, tzinfo=pytz.timezone("US/Mountain")), 
+                    datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.timezone("US/Mountain"))])
+        # hide x-label for all but last plot
+        if i < 4:
+            axi.xaxis.label.set_visible(False)
 
-        # get start points
-        lat, lon, elv = station_coords_avg(path_home, array_str)
-        p_start = np.array([lat, lon])
-
-        return output, p_start
-
-    array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
-
-    # calculate all intersections between each 2 arrays
-    all_ints = pd.DataFrame()
-    for (arr1_str, arr2_str) in itertools.combinations(array_list, 2):
-        arr1, p1 = load_ray_data(arr1_str, date_list, freq_str)
-        arr2, p2 = load_ray_data(arr2_str, date_list, freq_str)
-
-        #TODO
-        ## change from lat,lon to x,y in km
-        #p1_km = np.array([0, 0])
-        #p2_km = util_geo_km(orig_lon=p1[1], orig_lat=p1[0], lon=p2[1], lat=p2[0])
-
-        # calculate intersection
-        int_pts = arr1['Backaz'].combine(arr2['Backaz'], (lambda a1, a2: intersection(p1, a1, p2, a2)))
-
-        # change back to lon,lat
-        all_ints[f'{arr1_str}_{arr2_str}'] = int_pts
-    
-    # now find median intersection point
-    median_ints = pd.DataFrame()
-    median_ints['Lat'] = all_ints.apply(lambda col: [coord[0] for coord in col]).median(axis=1)
-    median_ints['Lon'] = all_ints.apply(lambda col: [coord[1] for coord in col]).median(axis=1)
-
-    # true coords
-    heli_coords = pd.read_pickle(os.path.join(path_home, 'data', 'test', 'heli_coords.pkl'))
-
-    # test plot
-    fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True)
-
-    ax[0].plot(median_ints.index, median_ints['Lat'], 'ro')
-    ax[0].plot(heli_coords.index, heli_coords['Latitude'], 'k-')
-    ax[1].plot(median_ints.index, median_ints['Lon'], 'ro')
-    ax[1].plot(heli_coords.index, heli_coords['Longitude'], 'k-')
-
-    #ax[0].set_ylim([-116.5, -117])
-    #ax[1].set_ylim([42.8, 43.4])
-
-    plt.show()
-    
-    print(median_ints)
-
-
-
-
-
-
-
-    geom = get_geometry(top, coordsys='lonlat', return_center=True)
-    coords_rel = pd.DataFrame({'x': geom[:-1,0], 
-                               'y': geom[:-1,1], 
-                               'z': geom[:-1,2] + geom[-1,2]})
-    fig, ax = plt.subplots(1, 1, tight_layout=True)
-    ax.plot(coords_rel['x'], coords_rel['y'], 'ko')
-    for i in range(len(coords_rel)):
-        ax.text(x=coords_rel['x'][i], y=coords_rel['y'][i], 
-                s=top[i].stats.station, ha='center', va='bottom')
-    plt.axis('square')
-    plt.show()
-    plt.close() 
-
-    #int_pts = pd.DataFrame()
-
-    #lon_int = (d - c) / (a - b)
+    fig.suptitle(f"Backazimuth, Data Filtered {freq_str}")
+    #plt.show()
+    # save figure
+    plt.savefig(os.path.join(path_home, "figures", f"backaz_ALLARRAYS_{freq_str}.png"), dpi=500)
+    plt.close()
 
     return
-    
 
 
 def basic_main(path_home):
@@ -244,7 +266,6 @@ def adsb_kml_to_df(path):
 
     return data_all
     
-
 def station_coords_avg(path_home, array_str):
     '''
     Find mean location for entire array. 
@@ -270,7 +291,6 @@ def station_coords_avg(path_home, array_str):
 
     return lat, lon, elv
 
-
 def helicoords_to_az(path_home, data, array_str):
 
     # find avg location for entire array specified
@@ -285,7 +305,32 @@ def helicoords_to_az(path_home, data, array_str):
     data = data.drop('az2', axis=1)
 
     return data
+
+def load_ray_data(array_str, date_list, freq_str):
+    # load processed infrasound data
+    path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
+                                "reynolds-creek", "data", "processed")
+    output = pd.DataFrame()
+    for date_str in date_list:
+        file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
+        output_tmp = pd.read_pickle(file)
+        output = pd.concat([output, output_tmp])
     
+    output = output.set_index('Time')
+    
+    #filt = lambda arr: arr[(arr['Time'] > '2023-10-07T17:00:00') & (arr['Time'] < '2023-10-07T18:30:00')]
+    #output = filt(output).set_index('Time')
+
+    # add column for angle (0 deg at x-axis, 90 deg at y-axis)
+    output['Angle'] = (-1 * output['Backaz'] + 90)%360
+
+    # get start points
+    lat, lon, elv = station_coords_avg(path_home, array_str)
+    # flip points since lon, lat is x, y
+    p_start = np.array([lon, lat])
+
+    return output, p_start
+
 def intersection(p1, a1, p2, a2):
     '''
     Calculates intersection point between two rays.
