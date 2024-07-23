@@ -1,7 +1,10 @@
 code/__pycache__
+test.py
+testing.py
 data/raw
 data/mseed
 data/fieldnotes
+data/test
 figures/
 data/processed/
 gis/
