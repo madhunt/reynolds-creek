@@ -77,7 +77,7 @@ def process_data(data, path_processed, time_start=None, time_stop=None, freqmin=
         time_stop : obspy UTCDateTime : if specified, time to end beamforming. If not specified, 
             will use min end time from all Gems.
     RETURNS
-        output : pd dataframe : array with 5 rows of output from array_processing. Rows are: timestamp, 
+        output : pd dataframe : array with 5 rows of output from array_processing. Rows are: timestamp (UTC), 
             relative power (semblance), absolute power, backazimuth (from 0-360), and slowness (in s/km).
     '''
     #FIXME doc string above

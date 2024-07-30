@@ -19,8 +19,8 @@ import matplotlib.animation as animation
 def main(path_home):
 
     date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
-    freqmin = 24.0
-    freqmax = 32.0
+    freqmin = 4.0
+    freqmax = 8.0
     freq_str = f"{freqmin}_{freqmax}"
 
     array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
