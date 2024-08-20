@@ -1,6 +1,12 @@
 #!/usr/bin/python3
 
-# code to import helicopter data and overplot with infrasound data
+# copied from helicopter.py
+# trying to determine the nature of errors in intersections
+# plot 5 backazimuths for each array and intersection point
+    # for each time
+    # then can scroll through / animate these 
+    # also plot the waveforms too!
+
 
 import plot_utils, utils
 import argparse, math, os, datetime, glob, pytz, itertools
@@ -15,6 +21,7 @@ from obspy.signal.array_analysis import get_geometry
 from obspy.signal.util import util_geo_km, util_lon_lat
 import xmltodict
 import matplotlib.animation as animation
+from matplotlib.pyplot import cm
 
 def main(path_home):
 
@@ -28,138 +35,214 @@ def main(path_home):
     # figure with all array backaz in subplots
     #plot_backaz_heli(path_home, date_list, array_list, freq_str)
     
-
     # calculate all intersections between each 2 arrays
+
     all_ints = pd.DataFrame()
-    for (arr1_str, arr2_str) in itertools.combinations(array_list, 2):
+    all_rays = pd.DataFrame()
+
+    for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         arr1, p1 = load_ray_data(arr1_str, date_list, freq_str)
         arr2, p2 = load_ray_data(arr2_str, date_list, freq_str)
 
+
+        # TODO FIXME LAT AND LON CHECK THESE
+
         # change from lat/lon to x,y in km
         p1_km = np.array([0, 0])
-        p2_km = util_geo_km(orig_lon=p1[0], orig_lat=p1[1], lon=p2[0], lat=p2[1])
+        p2_km = util_geo_km(orig_lon=p1[1], orig_lat=p1[0], lon=p2[1], lat=p2[0])
 
         # calculate intersection (using angle, not backaz)
         int_pts_km = arr1['Angle'].combine(arr2['Angle'], (lambda a1, a2: intersection(p1_km, a1, p2_km, a2)))
         
         # change back to lat/lon from km
-        int_pts = pd.DataFrame([util_lon_lat(p1[0], p1[1], km[0], km[1]) for km in int_pts_km], 
+        int_pts = pd.DataFrame([util_lon_lat(orig_lon=p1[1], orig_lat=p1[0], 
+                                             x=km[0], y=km[1]) for km in int_pts_km], 
                                columns=['Lon', 'Lat'], index=int_pts_km.index)
 
-        all_ints[f'{arr1_str}_{arr2_str} Lat'] = int_pts['Lat']#[col[1] for col in int_pts]
-        all_ints[f'{arr1_str}_{arr2_str} Lon'] = int_pts['Lon']#[col[0] for col in int_pts]
-    
+        # save intersection points
+        all_ints.index = int_pts.index
+        all_ints[f'{arr1_str}_{arr2_str}_Lat'] = int_pts['Lat']#[col[1] for col in int_pts]
+        all_ints[f'{arr1_str}_{arr2_str}_Lon'] = int_pts['Lon']#[col[0] for col in int_pts]
+
+        # save rays
+        all_rays.index = arr1.index
+        all_rays[arr1_str] = arr1['Angle']
+        all_rays[arr2_str] = arr2['Angle']
+
     # now find median intersection point
-    all_ints.index = int_pts.index
     median_ints = pd.DataFrame(index=int_pts.index)
     median_ints['Lat'] = all_ints.filter(regex='Lat').median(axis=1)
     median_ints['Lon'] = all_ints.filter(regex='Lon').median(axis=1)
+    # FIXME? get rid of outliers
+    #median_ints = median_ints[~((median_ints['Lat'] > median_ints['Lat'].quantile(0.99)) | 
+    #                            (median_ints['Lat'] < median_ints['Lat'].quantile(0.01)) | 
+    #                            (median_ints['Lon'] > median_ints['Lon'].quantile(0.99)) | 
+    #                            (median_ints['Lon'] < median_ints['Lon'].quantile(0.01)) )]
 
     # load in true helicopter data
     path_heli = os.path.join(path_home, "data", "helicopter")
     data_heli = adsb_kml_to_df(path_heli)
     data_heli = data_heli.set_index('Time')
-
-    
-    #############
-    filt = lambda arr: arr[(arr.index > '2023-10-07T17:45:00') & (arr.index < '2023-10-07T18:00:00')]
-    median_ints = filt(median_ints)
-    data_heli = filt(data_heli)
-    # resample data heli
+    # resample heli data
     data_heli = data_heli[~data_heli.index.duplicated(keep='first')]
     data_heli = data_heli.resample('30s').nearest()
-    # get rid of outliers
-    median_ints = median_ints[~((median_ints['Lat'] > median_ints['Lat'].quantile(0.99)) | 
-                                (median_ints['Lat'] < median_ints['Lat'].quantile(0.01)) | 
-                                (median_ints['Lon'] > median_ints['Lon'].quantile(0.99)) | 
-                                (median_ints['Lon'] < median_ints['Lon'].quantile(0.01)) )]
+    #FIXME change from nearest to something else??
+
+    # only use a subsection of points between times of interest
+    #filt = lambda arr: arr[(arr.index > '2023-10-07T17:45:00') & (arr.index < '2023-10-07T18:00:00')]
+    #median_ints = filt(median_ints)
+    #data_heli = filt(data_heli)
+
+    # plot all rays
+    for i, row in enumerate(all_rays.iterrows()):
+
+        fig, ax = plt.subplots(1, 1, tight_layout=True)
+
+        colors = cm.winter(np.linspace(0, 1, 5))
+        for j, arr_str in enumerate(array_list):
+            # get initial point, slope, and y-intercept of ray
+            p = station_coords_avg(path_home, arr_str)
+            m = np.tan(np.deg2rad(row[1][arr_str]))
+            b = p[0] - p[1]*m
+            # only plot positive end of the ray (arbitrary length 100)
+            ax.plot([p[1],  100], [p[0], 100*m + b],
+                     color=colors[j])
+            
+            # plot array centers as triangles
+            ax.scatter(p[1], p[0], c='k', marker='^')
+            ax.text(p[1], p[0]-0.0004, s=arr_str,
+                    va='center', ha='center')
+            
+        #FIXME for testing purposes plot all ints
+        for k in np.arange(0, 20, 2):
+            ax.scatter(all_ints.loc[row[0]][k+1], all_ints.loc[row[0]][k],
+                       c='green', marker='o')
+        #FIXME this is not right....
 
 
-    fig, ax = plt.subplots(3, 1, tight_layout=True, height_ratios=[3,1,1])
-    ax[0].set_xlim([min(median_ints['Lon'].min(), data_heli['Longitude'].min()),
-                max(median_ints['Lon'].max(), data_heli['Longitude'].max())])
-    ax[0].set_ylim([min(median_ints['Lat'].min(), data_heli['Latitude'].min()),
-                max(median_ints['Lat'].max(), data_heli['Latitude'].max())])
-    # ax1 is timeseries
-    ax[1].plot(median_ints.index, median_ints['Lat'], 'ro')
-    ax[1].plot(data_heli.index, data_heli['Latitude'], 'k-', label='Actual')
-    ax[1].set_title('Latitude')
-    ax[2].plot(median_ints.index, median_ints['Lon'], 'ro')
-    ax[2].plot(data_heli.index, data_heli['Longitude'], 'k-', label='Actual')
-    ax[2].set_title('Longitude')
-    ax[1].sharex(ax[2])
-    ax[2].set_xlabel("Mountain Time (Local)")
-    ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
-    fig.autofmt_xdate()
+        # plot median point
+        med_lat = median_ints.loc[row[0]]['Lat']
+        med_lon = median_ints.loc[row[0]]['Lon']
+        ax.plot(med_lon, med_lat, c='orange', marker='*', 
+                   markersize=10, label='Median Intersection')
 
-    ax[0].scatter(data_heli['Longitude'], data_heli['Latitude'], c='k', alpha=0.5, label='Actual')
-    ax[0].scatter(median_ints['Lon'], median_ints['Lat'], c='r', alpha=0.5, label='Triangulated')
-    ax[0].legend(loc='upper right')
-    fig.suptitle(f'{freq_str} Infrasound and Helicopter Coordinates')
-    plt.show()
+        # plot helicopter "true" point
+        heli_lat = data_heli.loc[row[0]]['Latitude']
+        heli_lon = data_heli.loc[row[0]]['Longitude']
+        ax.plot(heli_lon, heli_lat, c='red', marker='*', 
+                   markersize=10, label='True Heli Location')
 
-    # scatterplot
-    def animate_heli():
-        fig, ax = plt.subplots(3, 1, tight_layout=True, height_ratios=[3,1,1])
-        ax[0].set_xlim([min(median_ints['Lon'].min(), data_heli['Longitude'].min()),
-                    max(median_ints['Lon'].max(), data_heli['Longitude'].max())])
-        ax[0].set_ylim([min(median_ints['Lat'].min(), data_heli['Latitude'].min()),
-                    max(median_ints['Lat'].max(), data_heli['Latitude'].max())])
-        # ax1 is timeseries
-        ax[1].plot(median_ints.index, median_ints['Lat'], 'ro')
-        ax[1].plot(data_heli.index, data_heli['Latitude'], 'k-', label='Actual')
-        ax[1].set_title('Latitude')
-        ax[2].plot(median_ints.index, median_ints['Lon'], 'ro')
-        ax[2].plot(data_heli.index, data_heli['Longitude'], 'k-', label='Actual')
-        ax[2].set_title('Longitude')
-        ax[1].sharex(ax[2])
-        ax[2].set_xlabel("Mountain Time (Local)")
-        ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
-        fig.autofmt_xdate()
+        ax.legend(loc='upper left')
+        ax.set_xlim([-116.85, -116.74])
+        ax.set_ylim([43.10, 43.18])
 
-        graph1 = ax[0].scatter([], [], c='k', alpha=0.5, label='Actual')
-        graph2 = ax[0].scatter([], [], c='r', alpha=0.5, label='Triangulated')
-        v1 = ax[1].axvline(data_heli.index[0], ls='-', color='b', lw=1)
-        v2 = ax[2].axvline(data_heli.index[0], ls='-', color='b', lw=1)
-        ax[0].legend(loc='upper right')
-        def animate(i):
-            graph1.set_offsets(np.vstack((data_heli['Longitude'][:i+1], data_heli['Latitude'][:i+1])).T)
-            graph2.set_offsets(np.vstack((median_ints['Lon'][:i+1], median_ints['Lat'][:i+1])).T)
-            v1.set_xdata([data_heli.index[i], data_heli.index[i]])
-            v2.set_xdata([data_heli.index[i], data_heli.index[i]])
-            return graph1, graph2, v1, v2
-        ani = animation.FuncAnimation(fig, animate, repeat=True, interval=50, frames=(len(data_heli)-1))
+        plt.suptitle(row[0])
+
+
+        print(os.path.join(path_home, "figures", "backaz_errors", f"{row[0]}timestep.png"))
+        plt.savefig(os.path.join(path_home, "figures", "backaz_errors", f"{row[0]}timestep.png"), dpi=500)
+        plt.close()
         #plt.show()
-        ani.save(os.path.join(path_home, "figures", f"heli_coords.gif"), dpi=200)#, writer=animation.PillowWriter(fps=30))
-        return
+    # loop through time and plot backaz rays at each time
+   # print('plot time')
+    # also get waveforms
 
 
 
-    # timeseries plots
-    fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True, figsize=[8,5])
 
-    ax[0].plot(median_ints.index, median_ints['Lat'], 'ro')
-    ax[0].plot(data_heli['Time'], data_heli['Latitude'], 'k-', label='Actual')
-    ax[1].plot(median_ints.index, median_ints['Lon'], 'ro')
-    ax[1].plot(data_heli['Time'], data_heli['Longitude'], 'k-', label='Actual')
 
-    #ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=1))
 
-    ax[0].set_ylim([43.05, 43.17])
-    ax[1].set_ylim([-116.85,-116.70])
-    ax[0].set_xlim([datetime.datetime(2023, 10, 7, 9, 45, 0, tzinfo=pytz.timezone("US/Mountain")), 
-                datetime.datetime(2023, 10, 7, 11, 30, 0, tzinfo=pytz.timezone("US/Mountain"))])
 
-    ax[0].set_title("Latitude")
-    ax[1].set_title("Longitude")
-    ax[0].legend(loc='lower right')
-    ax[1].legend(loc='lower right')
-    ax[0].grid()
-    ax[1].grid()
+    #fig, ax = plt.subplots(3, 1, tight_layout=True, height_ratios=[3,1,1])
+    #ax[0].set_xlim([min(median_ints['Lon'].min(), data_heli['Longitude'].min()),
+    #            max(median_ints['Lon'].max(), data_heli['Longitude'].max())])
+    #ax[0].set_ylim([min(median_ints['Lat'].min(), data_heli['Latitude'].min()),
+    #            max(median_ints['Lat'].max(), data_heli['Latitude'].max())])
+    ## ax1 is timeseries
+    #ax[1].plot(median_ints.index, median_ints['Lat'], 'ro')
+    #ax[1].plot(data_heli.index, data_heli['Latitude'], 'k-', label='Actual')
+    #ax[1].set_title('Latitude')
+    #ax[2].plot(median_ints.index, median_ints['Lon'], 'ro')
+    #ax[2].plot(data_heli.index, data_heli['Longitude'], 'k-', label='Actual')
+    #ax[2].set_title('Longitude')
+    #ax[1].sharex(ax[2])
+    #ax[2].set_xlabel("Mountain Time (Local)")
+    #ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
+    #fig.autofmt_xdate()
 
-    # save figure
-    plt.savefig(os.path.join(path_home, "figures", f"heli_coords_comparison.png"), dpi=500)
-    plt.close()
+    #ax[0].scatter(data_heli['Longitude'], data_heli['Latitude'], c='k', alpha=0.5, label='Actual')
+    #ax[0].scatter(median_ints['Lon'], median_ints['Lat'], c='r', alpha=0.5, label='Triangulated')
+
+    ## plot center of array coords for reference
+
+
+    #ax[0].legend(loc='upper right')
+    #fig.suptitle(f'{freq_str} Infrasound and Helicopter Coordinates')
+    #plt.show()
+    #print('done')
+
+    ## scatterplot
+    #def animate_heli():
+    #    fig, ax = plt.subplots(3, 1, tight_layout=True, height_ratios=[3,1,1])
+    #    ax[0].set_xlim([min(median_ints['Lon'].min(), data_heli['Longitude'].min()),
+    #                max(median_ints['Lon'].max(), data_heli['Longitude'].max())])
+    #    ax[0].set_ylim([min(median_ints['Lat'].min(), data_heli['Latitude'].min()),
+    #                max(median_ints['Lat'].max(), data_heli['Latitude'].max())])
+    #    # ax1 is timeseries
+    #    ax[1].plot(median_ints.index, median_ints['Lat'], 'ro')
+    #    ax[1].plot(data_heli.index, data_heli['Latitude'], 'k-', label='Actual')
+    #    ax[1].set_title('Latitude')
+    #    ax[2].plot(median_ints.index, median_ints['Lon'], 'ro')
+    #    ax[2].plot(data_heli.index, data_heli['Longitude'], 'k-', label='Actual')
+    #    ax[2].set_title('Longitude')
+    #    ax[1].sharex(ax[2])
+    #    ax[2].set_xlabel("Mountain Time (Local)")
+    #    ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M", tz="US/Mountain"))
+    #    fig.autofmt_xdate()
+
+    #    graph1 = ax[0].scatter([], [], c='k', alpha=0.5, label='Actual')
+    #    graph2 = ax[0].scatter([], [], c='r', alpha=0.5, label='Triangulated')
+    #    v1 = ax[1].axvline(data_heli.index[0], ls='-', color='b', lw=1)
+    #    v2 = ax[2].axvline(data_heli.index[0], ls='-', color='b', lw=1)
+    #    ax[0].legend(loc='upper right')
+    #    def animate(i):
+    #        graph1.set_offsets(np.vstack((data_heli['Longitude'][:i+1], data_heli['Latitude'][:i+1])).T)
+    #        graph2.set_offsets(np.vstack((median_ints['Lon'][:i+1], median_ints['Lat'][:i+1])).T)
+    #        v1.set_xdata([data_heli.index[i], data_heli.index[i]])
+    #        v2.set_xdata([data_heli.index[i], data_heli.index[i]])
+    #        return graph1, graph2, v1, v2
+    #    ani = animation.FuncAnimation(fig, animate, repeat=True, interval=50, frames=(len(data_heli)-1))
+    #    #plt.show()
+    #    ani.save(os.path.join(path_home, "figures", f"heli_coords.gif"), dpi=200)#, writer=animation.PillowWriter(fps=30))
+    return
+
+
+
+    ## timeseries plots
+    #fig, ax = plt.subplots(2, 1, tight_layout=True, sharex=True, figsize=[8,5])
+
+    #ax[0].plot(median_ints.index, median_ints['Lat'], 'ro')
+    #ax[0].plot(data_heli['Time'], data_heli['Latitude'], 'k-', label='Actual')
+    #ax[1].plot(median_ints.index, median_ints['Lon'], 'ro')
+    #ax[1].plot(data_heli['Time'], data_heli['Longitude'], 'k-', label='Actual')
+
+    ##ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=1))
+
+    #ax[0].set_ylim([43.05, 43.17])
+    #ax[1].set_ylim([-116.85,-116.70])
+    #ax[0].set_xlim([datetime.datetime(2023, 10, 7, 9, 45, 0, tzinfo=pytz.timezone("US/Mountain")), 
+    #            datetime.datetime(2023, 10, 7, 11, 30, 0, tzinfo=pytz.timezone("US/Mountain"))])
+
+    #ax[0].set_title("Latitude")
+    #ax[1].set_title("Longitude")
+    #ax[0].legend(loc='lower right')
+    #ax[1].legend(loc='lower right')
+    #ax[0].grid()
+    #ax[1].grid()
+
+    ## save figure
+    #plt.savefig(os.path.join(path_home, "figures", f"heli_coords_comparison.png"), dpi=500)
+    #plt.close()
     return
     
 
@@ -371,7 +454,7 @@ def load_ray_data(array_str, date_list, freq_str):
     # get start points
     lat, lon, elv = station_coords_avg(path_home, array_str)
     # flip points since lon, lat is x, y
-    p_start = np.array([lon, lat])
+    p_start = np.array([lat, lon])
 
     return output, p_start
 
