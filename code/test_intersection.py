@@ -1,66 +1,79 @@
 #!/usr/bin/python3
 
 import pytest
+import numpy as np
+# import from personal scripts
 import triangulate
 
-import numpy as np
 
+def main():
+    '''
+    Runs 5 test cases for intersection() function. Tests correct intersection of points and special 
+        cases that should return an intersection point of (nan, nan), like parallel lines and an intersection 
+        "behind" the two rays.
+    '''
+    # normal points in Q1 intersecting in Q1
+    test1 = {'p1': np.array([1, 3]),
+             'a1': 120,
+             'p2': np.array([5, 7]),
+             'a2': 200,
+             'int_x': 3.10,
+             'int_y': 1.79}
+    # normal pointsin Q1, Q2 intersecting in Q3
+    test2 = {'p1': np.array([5, -3]),
+             'a1': 280,
+             'p2': np.array([3, 4]),
+             'a2': 230,
+             'int_x': -3.55,
+             'int_y': -1.49}
+    # parallel rays with same angle
+    test3 = {'p1': np.array([4, 1]),
+             'a1': 35,
+             'p2': np.array([-5, -3]),
+             'a2': 35,
+             'int_x': np.nan,
+             'int_y': np.nan}
+    # parallel rays with angle 180 deg off
+    test4 = {'p1': np.array([-2, 5]),
+             'a1': 110,
+             'p2': np.array([3, -8]),
+             'a2': 290,
+             'int_x': np.nan,
+             'int_y': np.nan}
+    # intersection point "behind" rays
+    test5 = {'p1': np.array([-3, 3]),
+             'a1': 300,
+             'p2': np.array([-7, 5]),
+             'a2': 190,
+             'int_x': np.nan,
+             'int_y': np.nan}
 
-def test_unit_intersection():
-
-    # make up some points and azimuths
-    p1 = np.array([1, 3])
-    a1 = 120
-    p2 = np.array([5, 7])
-    a2 = 200
-    # use intersect to find intersections
-    int_pt = triangulate.intersection(p1, a1, p2, a2)
-    # assert that this intersection is the same as the one calculated
-    assert np.round(int_pt[0], 2) == 3.10
-    assert np.round(int_pt[1], 2) == 1.79
-
-    # test parallel rays
-    # check that it fails in the right way (eg returns nans in this case)
-    p1 = np.array([4, 1])
-    a1 = 35
-    p2 = np.array([-5, -3])
-    a2 = 35
-    int_pt = triangulate.intersection(p1, a1, p2, a2)
-    assert np.isnan(int_pt[0])
-    assert np.isnan(int_pt[1])
-
-    p1 = np.array([-2, 5])
-    a1 = 110
-    p2 = np.array([3, -8])
-    a2 = 290
-    int_pt = triangulate.intersection(p1, a1, p2, a2)
-    assert np.isnan(int_pt[0])
-    assert np.isnan(int_pt[1])
-
-    # test intersection pt "behind" rays
-    p1 = np.array([-3, 3])
-    a1 = 300
-    p2 = np.array([-7, 5])
-    a2 = 190
-    int_pt = triangulate.intersection(p1, a1, p2, a2)
-    assert np.isnan(int_pt[0])
-    assert np.isnan(int_pt[1])
-
-
-    # maybe one more angle test with diff angles 
-    p1 = np.array([5, -3])
-    a1 = 280
-    p2 = np.array([3, 4])
-    a2 = 230
-    int_pt = triangulate.intersection(p1, a1, p2, a2)
-    assert np.round(int_pt[0], 2) == -3.55
-    assert np.round(int_pt[1], 2) == -1.49
-
-
-
+    # run tests through intersection function
+    test_intersection(test1)
+    test_intersection(test2)
+    test_intersection(test3)
+    test_intersection(test4)
+    test_intersection(test5)
     return
 
 
+def test_intersection(test_dict):
+    '''
+    Calls intersection() function with provided test case.
+    INPUTS
+        test_dict   : dict  : Contains p1, a1, p2, a2 of test rays, and manually calculated 
+            intersection (int_x, int_y).
+    '''
+    int_pt = triangulate.intersection(test_dict['p1'], test_dict['a1'], test_dict['p2'], test_dict['a2'])
+
+    if np.isnan(test_dict['int_x']) and np.isnan(test_dict['int_y']):
+        assert np.isnan(int_pt[0])
+        assert np.isnan(int_pt[1])
+    else: 
+        assert np.round(int_pt[0], 2) == test_dict['int_x']
+        assert np.round(int_pt[1], 2) == test_dict['int_y']
+    return
 
 
-test_unit_intersection()
+if __name__ == "__main__":
+    main()
