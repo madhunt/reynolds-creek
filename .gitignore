@@ -6,3 +6,4 @@ figures/
 data/processed/
 gis/
 log/
+*.pyc
