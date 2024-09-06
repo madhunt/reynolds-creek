@@ -1,7 +1,0 @@
-Job Name              = 
-Time Submitted        = Thu Jun 20 16:37:08 MDT 2024
-Hostname              = cpu136
-PWD                   = /bsuhome/madelinehunt/reynolds-creek/code
-Num Nodes Allocated   = 1
-Num Tasks Allocated   = 1
-slurmstepd: error: *** JOB 1111897 ON cpu136 CANCELLED AT 2024-06-21T07:37:15 DUE TO TIME LIMIT ***
