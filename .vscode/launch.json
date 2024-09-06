@@ -10,7 +10,18 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-i", "/media/mad/LaCie 2 LT/research/reynolds-creek/TOP_10-07"],
+            // beamform.py args one bandpass
+            //"args": ["-p", "-f", "24", "32", "-a", "JD", "-t1", "2023-10-06"],
+
+            // beamform.py args PARALLEL
+            //"args": ["-p", "-b", "-F", "0.5", "2", "-x", "TOP07"],
+
+            // testing plotting
+            //"args": ["-b", "-f", "24", "32", "-x", "TOP07"],
+
+            // pre-process.py args
+            "args": ["-a", "JD", "-t1", "2023-10-05", "-t2", "2023-10-08"],
+            //"args": [],
             "env": {"PYDEVD_WARN_EVALUATION_TIMEOUT": "500"}
         }
     ]

@@ -1,11 +1,15 @@
 # Reynolds Creek Experimental Watershed
-Array data from RCEW prescribed burn.
+Array processing code and results from Reynolds Creek Experimental Watershed (RCEW) prescribed burn.
 
 
 ## Repository Overview
 
 All data stored in `data` folder, including raw miniseed files, survey coordinates, and processed data.
 
+### Workflow
+1. **Pre-Process Data**: Use `preprocess.py` to plot raw traces and inspect. Note if any traces should be removed from processing. Re-run to pre-process data (e.g. shift traces back by an integer number of seconds). This script will read raw mseed files from `data/raw` and save pre-processed data in `data/mseed` directory. 
+
+2. **Process Data**: Use `beamform.py` to process data with conventional shift-and-stack beamforming. This script will produce backazimuth and slowness plots in `figures`, and will save processed data as a pkl file to `data/processed`. 
 
 
 ## Field Site
