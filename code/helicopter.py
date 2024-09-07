@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # code to import helicopter data and overplot with infrasound data
+# copy of triangulate
 
 import plot_utils, utils
 import argparse, math, os, datetime, glob, pytz, itertools
@@ -32,15 +33,15 @@ def main(path_home):
     # calculate all intersections between each 2 arrays
     all_ints = pd.DataFrame()
     for (arr1_str, arr2_str) in itertools.combinations(array_list, 2):
-        arr1, p1 = load_ray_data(arr1_str, date_list, freq_str)
-        arr2, p2 = load_ray_data(arr2_str, date_list, freq_str)
+        arr1, p1_latlon = load_ray_data(arr1_str, date_list, freq_str)
+        arr2, p2_latlon = load_ray_data(arr2_str, date_list, freq_str)
 
         # change from lat/lon to x,y in km
-        p1_km = np.array([0, 0])
-        p2_km = util_geo_km(orig_lon=p1[0], orig_lat=p1[1], lon=p2[0], lat=p2[1])
+        p1_xy = np.array([0, 0])
+        p2_xy = util_geo_km(orig_lon=p1_latlon[0], orig_lat=p1_latlon[1], lon=p2_latlon[0], lat=p2_latlon[1])
 
         # calculate intersection (using angle, not backaz)
-        int_pts_km = arr1['Angle'].combine(arr2['Angle'], (lambda a1, a2: intersection(p1_km, a1, p2_km, a2)))
+        int_pts_km = arr1['Angle'].combine(arr2['Angle'], (lambda a1, a2: intersection(p1_xy, a1, p2_xy, a2)))
         
         # change back to lat/lon from km
         int_pts = pd.DataFrame([util_lon_lat(p1[0], p1[1], km[0], km[1]) for km in int_pts_km], 
