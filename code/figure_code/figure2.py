@@ -9,7 +9,6 @@ import matplotlib.dates as mdates
 # import from personal scripts
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import triangulate
-import plot_utils
 
 def main():
     # figure with all array backaz in subplots
@@ -17,24 +16,22 @@ def main():
     date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
     freqmin = 24.0
     freqmax = 32.0
-    freq_str = f"{freqmin}_{freqmax}"
 
-
-    # FIXME ugly and you know it 
-    # path to this file
-    path_curr = os.path.dirname(os.path.realpath(__file__))
-    path_home = os.path.abspath(os.path.join(path_curr, '..', '..'))
-    path_heli = os.path.join(path_home, "data", "helicopter")
-    # load processed infrasound data for all days of interest
-    path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
-                                "reynolds-creek", "data", "processed")
+    # FIXME this is ugly but not as bad as it once was
+    path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
+    path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
+    # path nonsense
+    path_heli = os.path.join(path_harddrive, "data", "helicopter")
+    path_processed = os.path.join(path_harddrive, "data", "processed")
+    path_station_gps = os.path.join(path_harddrive, "data", "gps")
     path_figures = os.path.join(path_home, "figures")
-    plot_backaz_heli_allarrays(path_home, path_heli, path_processed, 
-                     path_figures, date_list, freq_str)
+
+    plot_backaz_heli_allarrays(path_heli, path_processed, path_station_gps,
+                     path_figures, date_list, freqmin, freqmax)
     return
 
-def plot_backaz_heli_allarrays(path_home, path_heli, path_processed, 
-                     path_figures, date_list, freq_str):
+def plot_backaz_heli_allarrays(path_heli, path_processed, path_station_gps,
+                     path_figures, date_list, freqmin, freqmax):
     '''
     Plot calculated backazimuths overlaid with helicopter location data for 
         each array (TOP, JDNA, JDNB, JDSA, and JDSB). 
@@ -47,6 +44,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
                      "JDSA (4 sensors)", "JDSB (4 sensors)"]
 
     fig, ax = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=[12,9])
+    freq_str = f"{freqmin}_{freqmax}"
 
     for i, array_str in enumerate(array_list):
         # LOAD PROCESSED BACKAZIMUTH DATA
@@ -73,7 +71,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
         # LOAD HELICOPTER TRACK DATA
         data = triangulate.adsb_kml_to_df(path_heli)
         # convert heli coords to dist/azimuth from current array
-        data_heli = triangulate.helicoords_to_az(path_home, data, array_str)
+        data_heli = triangulate.helicoords_to_az(path_station_gps, data, array_str)
         # mask data points at the end of a long data gap (for plotting purposes)
         data_heli['Masked Azimuth'] = np.ma.masked_where(data_heli["Time"].diff() > datetime.timedelta(minutes=15), 
                                                          data_heli["Azimuth"])
@@ -83,7 +81,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
 
         # PLOT HELICOPTER DATA
         ax[i].plot(data_heli.index, data_heli['Masked Azimuth'], '-', color='red', 
-                alpha=0.6, label='Helicopter\nTrack')
+                alpha=0.6, label="Helicopter,\nrelative\nto array")
 
         # SUBPLOT FORMATTING
         ax[i].set_title(subtitle_list[i], fontsize=12)
@@ -93,7 +91,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
     
     # AXIS-SPECIFIC FORMATTING
     # add legend outside axes on top subplot
-    ax[0].legend(bbox_to_anchor=(1.0, 0.4), 
+    ax[0].legend(bbox_to_anchor=(1.0, 0.35), 
                     fancybox=False, framealpha=1.0, 
                     edgecolor="black", fontsize=12)
     # add y-label on middle subplot
@@ -112,7 +110,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
     ax[4].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz=pytz.timezone("US/Mountain")))
 
     # FIGURE FORMATTING
-    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth, Filtered 24-32 Hz, 2023-10-07", 
+    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth, Filtered {freqmin}-{freqmax} Hz, 2023-10-07", 
                  fontsize=16)
     fig.tight_layout()
     # add colorbar across all subplots
@@ -127,6 +125,7 @@ def plot_backaz_heli_allarrays(path_home, path_heli, path_processed,
     return
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    # copied from a helpful stack overflow comment
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
         cmap(np.linspace(minval, maxval, n)))
