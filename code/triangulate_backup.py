@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import plot_utils
 import os, datetime, glob, pytz, itertools, xmltodict
 import numpy as np
 import pandas as pd
@@ -18,12 +19,6 @@ def main(path_home):
     freq_str = f"{freqmin}_{freqmax}"
 
     array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
-    path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
-    path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
-    path_processed = os.path.join(path_harddrive, "data", "processed")
-    path_heli = os.path.join(path_harddrive, "data", "helicopter")
-    path_station_gps = os.path.join(path_harddrive, "data", "gps")
-    path_figures = os.path.join(path_home, "figures")
 
     
 
@@ -34,29 +29,32 @@ def main(path_home):
     # calculate intersections at each timestep for each pair of arrays
     for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         # load in processed data and calculate center point of array (lat, lon)
-        arr1, p1 = load_ray_data(path_processed, arr1_str, date_list, freq_str, path_station_gps)
-        arr2, p2 = load_ray_data(path_processed, arr2_str, date_list, freq_str, path_station_gps)
-        ## change from lat,lon to x,y in km
-        #p1_km = np.array([0, 0])
-        #p2_km = util_geo_km(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
-        #                    lon=p2_latlon[1], lat=p2_latlon[0])
+        arr1, p1_latlon = load_ray_data(arr1_str, date_list, freq_str)
+        arr2, p2_latlon = load_ray_data(arr2_str, date_list, freq_str)
+
+        # change from lat,lon to x,y in km
+        p1_km = np.array([0, 0])
+        p2_km = util_geo_km(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], lon=p2_latlon[1], lat=p2_latlon[0])
+
         # calculate intersection
-        int_pts = pd.DataFrame()
-        int_pts['result'] = arr1['Backaz'].combine(arr2['Backaz'], 
-                                           (lambda a1, a2: intersection(p1, a1, p2, a2, latlon=True)))
-        int_pts['Lat'] = [x[0] for x in int_pts['result']]
-        int_pts['Lon'] = [x[1] for x in int_pts['result']]
-        int_pts.drop('result', axis=1)
-        ## change back to lat/lon from km
-        #int_pts = pd.DataFrame([util_lon_lat(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
-        #                                     x=km[0], y=km[1]) for km in int_pts_km], 
-        #                       columns=['Lon', 'Lat'], index=int_pts_km.index)
+        int_pts_km = arr1['Backaz'].combine(arr2['Backaz'], 
+                                           (lambda a1, a2: intersection(p1_km, a1, p2_km, a2)))
+        
+        # change back to lat/lon from km
+        int_pts = pd.DataFrame([util_lon_lat(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
+                                             x=km[0], y=km[1]) for km in int_pts_km], 
+                               columns=['Lon', 'Lat'], index=int_pts_km.index)
+        
+        # NOTE TO MAD TOMORROW: make a plot here to visulaize km vs lat/lon intersection **************
+        #******
+
         # save intersection points
-        #all_ints.index = int_pts.index
+        all_ints.index = int_pts.index
         all_ints[f'{arr1_str}_{arr2_str}_Lat'] = int_pts['Lat']#[col[1] for col in int_pts]
         all_ints[f'{arr1_str}_{arr2_str}_Lon'] = int_pts['Lon']#[col[0] for col in int_pts]
+
         # save rays
-        #all_rays.index = arr1.index
+        all_rays.index = arr1.index
         all_rays[arr1_str] = arr1['Backaz']
         all_rays[arr2_str] = arr2['Backaz']
 
@@ -65,7 +63,15 @@ def main(path_home):
     median_ints['Lat'] = all_ints.filter(regex='Lat').median(axis=1)
     median_ints['Lon'] = all_ints.filter(regex='Lon').median(axis=1)
 
+
+    # FIXME? get rid of outliers
+    #median_ints = median_ints[~((median_ints['Lat'] > median_ints['Lat'].quantile(0.99)) | 
+    #                            (median_ints['Lat'] < median_ints['Lat'].quantile(0.01)) | 
+    #                            (median_ints['Lon'] > median_ints['Lon'].quantile(0.99)) | 
+    #                            (median_ints['Lon'] < median_ints['Lon'].quantile(0.01)) )]
+
     # load in true helicopter data
+    path_heli = os.path.join(path_home, "data", "helicopter")
     data_heli = adsb_kml_to_df(path_heli)
     data_heli = data_heli.set_index('Time')
     # resample heli data
@@ -80,40 +86,41 @@ def main(path_home):
 
     # plot all rays
     for i, row in enumerate(all_rays.iterrows()):
+
         fig, ax = plt.subplots(1, 1, tight_layout=True)
+
         colors = cm.winter(np.linspace(0, 1, 5))
         for j, arr_str in enumerate(array_list):
             # get initial point, slope, and y-intercept of ray
-            p = station_coords_avg(path_station_gps, arr_str)
-            a = row[1][arr_str]
-            m = 1 / np.tan(np.deg2rad(a))
+            p = station_coords_avg(path_home, arr_str)
+            m = np.tan(np.deg2rad(row[1][arr_str]))
+            #NOTE THIS IS NOT THE SLOPE IN AZIMUTHAL COORDS***
             b = p[0] - p[1]*m
             # only plot positive end of the ray (arbitrary length 100)
-            if a > 180:
-                ax.plot([p[1], -1000], [p[0], -1000*m+b], 
-                        color=colors[j])
-            else: 
-                ax.plot([p[1],  1000], [p[0], 1000*m + b],
-                        color=colors[j])
+            ax.plot([p[1],  100], [p[0], 100*m + b],
+                     color=colors[j])
+            
             # plot array centers as triangles
             ax.scatter(p[1], p[0], c='k', marker='^')
             ax.text(p[1], p[0]-0.0004, s=arr_str,
                     va='center', ha='center')
-        #FIXME for testing purposes plot all intersections
+            
+        #FIXME for testing purposes plot all ints
         for k in np.arange(0, 20, 2):
-            t = row[0]
-            ax.scatter(all_ints.loc[t][k+1], all_ints.loc[t][k],
+            ax.scatter(all_ints.loc[row[0]][k+1], all_ints.loc[row[0]][k],
                        c='green', marker='o')
+        #FIXME this is not right....
+
 
         # plot median point
-        med_lat = median_ints.loc[t]['Lat']
-        med_lon = median_ints.loc[t]['Lon']
+        med_lat = median_ints.loc[row[0]]['Lat']
+        med_lon = median_ints.loc[row[0]]['Lon']
         ax.plot(med_lon, med_lat, c='orange', marker='*', 
                    markersize=10, label='Median Intersection')
 
         # plot helicopter "true" point
-        heli_lat = data_heli.loc[t]['Latitude']
-        heli_lon = data_heli.loc[t]['Longitude']
+        heli_lat = data_heli.loc[row[0]]['Latitude']
+        heli_lon = data_heli.loc[row[0]]['Longitude']
         ax.plot(heli_lon, heli_lat, c='red', marker='*', 
                    markersize=10, label='True Heli Location')
 
@@ -121,19 +128,23 @@ def main(path_home):
         ax.set_xlim([-116.85, -116.74])
         ax.set_ylim([43.10, 43.18])
 
-        plt.suptitle(t)
-        #plt.show()
-        print(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"))
-        plt.savefig(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"), dpi=500)
+        plt.suptitle(row[0])
+        plt.show()
+
+
+
+        ##TODO
+        # plot waveforms / pwr for each array (median?)
+        # waveform for TOP? 
+
+
+        print(os.path.join(path_home, "figures", "backaz_errors", f"{row[0]}timestep.png"))
+        plt.savefig(os.path.join(path_home, "figures", "backaz_errors", f"{row[0]}timestep.png"), dpi=500)
         plt.close()
         #plt.show()
     # loop through time and plot backaz rays at each time
    # print('plot time')
     # also get waveforms
-        ##TODO
-        # plot waveforms / pwr for each array (median?)
-        # waveform for TOP? 
-
 
 
     return
@@ -141,48 +152,48 @@ def main(path_home):
 
 
 
-#def basic_main(path_home):
-    #date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
-    #array_str = "TOP"
-    #freqmin = 24.0
-    #freqmax = 32.0
-    #freq_str = f"{freqmin}_{freqmax}"
+def basic_main(path_home):
+    date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
+    array_str = "TOP"
+    freqmin = 24.0
+    freqmax = 32.0
+    freq_str = f"{freqmin}_{freqmax}"
 
-    ## load in helicopter data
-    #path_heli = os.path.join(path_home, "data", "helicopter")
-    #data_heli = adsb_kml_to_df(path_heli)
+    # load in helicopter data
+    path_heli = os.path.join(path_home, "data", "helicopter")
+    data_heli = adsb_kml_to_df(path_heli)
 
-    ## convert heli coords to dist/azimuth from array
-    #data_heli = helicoords_to_az(path_home, data_heli, array_str)
+    # convert heli coords to dist/azimuth from array
+    data_heli = helicoords_to_az(path_home, data_heli, array_str)
 
-    ## load processed infrasound data
-    ## path to data on harddrive
-    #path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
-                                  #"reynolds-creek", "data", "processed")
-    ##path_processed = os.path.join(path_home, "data", "processed", "window_60s")
-    #output = pd.DataFrame()
-    #for date_str in date_list:
-        #file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
-        #output_tmp = pd.read_pickle(file)
-        #output = pd.concat([output, output_tmp])
+    # load processed infrasound data
+    # path to data on harddrive
+    path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
+                                  "reynolds-creek", "data", "processed")
+    #path_processed = os.path.join(path_home, "data", "processed", "window_60s")
+    output = pd.DataFrame()
+    for date_str in date_list:
+        file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
+        output_tmp = pd.read_pickle(file)
+        output = pd.concat([output, output_tmp])
 
-    ## plot processed data
-    #fig, ax = plot_utils.plot_backaz(output=output, path_home=path_home, 
-                        #subtitle_str=f"{array_str} Array, Filtered {freqmin} to {freqmax} Hz", file_str=None)
+    # plot processed data
+    fig, ax = plot_utils.plot_backaz(output=output, path_home=path_home, 
+                        subtitle_str=f"{array_str} Array, Filtered {freqmin} to {freqmax} Hz", file_str=None)
     
-    ## plot heli data
-    #ax.plot(data_heli['Time'], data_heli['Azimuth'], '-', color='green', 
-            #alpha=0.6, label='Helicopter Track')
-    #ax.legend(loc='upper right')
+    # plot heli data
+    ax.plot(data_heli['Time'], data_heli['Azimuth'], '-', color='green', 
+            alpha=0.6, label='Helicopter Track')
+    ax.legend(loc='upper right')
 
-    #ax.set_xlim([datetime.datetime(2023, 10, 7, 9, 0, 0, tzinfo=pytz.timezone("US/Mountain")), 
-                 #datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.timezone("US/Mountain"))])
+    ax.set_xlim([datetime.datetime(2023, 10, 7, 9, 0, 0, tzinfo=pytz.timezone("US/Mountain")), 
+                 datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.timezone("US/Mountain"))])
 
-    ## save figure
-    #plt.savefig(os.path.join(path_home, "figures", f"backaz_{array_str}_{freq_str}.png"), dpi=500)
-    #plt.close()
+    # save figure
+    plt.savefig(os.path.join(path_home, "figures", f"backaz_{array_str}_{freq_str}.png"), dpi=500)
+    plt.close()
 
-    #return
+    return
 
 def adsb_kml_to_df(path):
     '''
@@ -224,7 +235,7 @@ def adsb_kml_to_df(path):
 
     return data_all
     
-def station_coords_avg(path_gps, array_str):
+def station_coords_avg(path_home, array_str):
     '''
     Find mean location for entire array. 
     INPUTS: 
@@ -234,8 +245,9 @@ def station_coords_avg(path_gps, array_str):
         lon : float : Average longitude for station.
         elv : float : Average elevation for station.
     '''
+    path_data = os.path.join(path_home, "data", "mseed")
     # TODO FIXME path
-    path_coords = glob.glob(os.path.join(path_gps, "*.csv" ))
+    path_coords = glob.glob(os.path.join(path_data, "..", "gps", "*.csv" ))
     coords = pd.DataFrame()
     for file in path_coords:
         coords = pd.concat([coords, pd.read_csv(file)])
@@ -248,11 +260,11 @@ def station_coords_avg(path_gps, array_str):
 
     return lat, lon, elv
 
-def helicoords_to_az(path_station_gps, data, array_str):
+def helicoords_to_az(path_home, data, array_str):
 
     # find avg location for entire array specified
     #TODO FIXME path
-    coords_top = station_coords_avg(path_station_gps, array_str)
+    coords_top = station_coords_avg(path_home, array_str)
 
     # use gps2dist to get distance and azimuth between heli and TOP array
     data[['Distance', 'Azimuth', 'az2']] = data.apply(lambda x: 
@@ -263,8 +275,10 @@ def helicoords_to_az(path_station_gps, data, array_str):
 
     return data
 
-def load_ray_data(path_processed, array_str, date_list, freq_str, path_gps):
+def load_ray_data(array_str, date_list, freq_str):
     # load processed infrasound data
+    path_processed = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", 
+                                "reynolds-creek", "data", "processed")
     output = pd.DataFrame()
     for date_str in date_list:
         file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
@@ -280,32 +294,24 @@ def load_ray_data(path_processed, array_str, date_list, freq_str, path_gps):
     #output['Angle'] = (-1 * output['Backaz'] + 90)%360
 
     # get start points
-    lat, lon, elv = station_coords_avg(path_gps, array_str)
+    lat, lon, elv = station_coords_avg(path_home, array_str)
     p_start = np.array([lat, lon])
 
     return output, p_start
 
-def intersection(p1, a1, p2, a2, latlon=True):
+def intersection(p1, a1, p2, a2):
     '''
     Calculates intersection point between two rays, given starting points and azimuths (from N).
     INPUTS
-        p1      : np array, 2x1 : Coordinates for start point of ray 1.
-        a1      : float         : Azimuth of ray 1 direction in degrees (clockwise from North).
-        p2      : np array, 2x1 : Coordinates for start point of ray 2.
-        a2      : float         : Azimuth of ray 2 direction in degrees (clockwise from North).
-        latlon  : bool          : Default False (coordinates are of the form x,y).
-            If True, coordinates are provided as lat,lon (y,x).
+        p1 : np array, 2x1 : Coordinates (x,y) for start point of ray 1.
+        a1 : float : Azimuth of ray 1 direction in degrees (clockwise from North).
+        p2 : np array, 2x1 : Coordinates (x,y) for start point of ray 2.
+        a2 : float : Azimuth of ray 2 direction in degrees (clockwise from North).
     RETURNS
-        int_pt : np array, 2x1 : Coordinates of intersection point. 
-            If latlon=False, coordinates are returned as x,y. 
-            If latlon=True, coordinates are returned as lat,lon (y,x).
+        int_pt : np array, 2x1 : Coordinates (x,y) of intersection point. 
             Returns [NaN, NaN] if there is no intersection; e.g. if intersection 
             occurs "behind" ray start points or if rays are parallel. 
     '''
-    if latlon == True:
-        # swap the order of coordinates to lon,lat
-        p1 = np.array([p1[1], p1[0]])
-        p2 = np.array([p2[1], p2[0]])
     # create matrix of direction unit vectors
     D = np.array([[np.sin(np.radians(a1)), -np.sin(np.radians(a2))],
                       [np.cos(np.radians(a1)), -np.cos(np.radians(a2))]])
@@ -328,9 +334,6 @@ def intersection(p1, a1, p2, a2, latlon=True):
     # calculate intersection point
     int_pt = np.array([p1[0]+D[0,0]*t[0],
                        p1[1]+D[1,0]*t[0]])
-    if latlon == True: 
-        # return intersection as lat,lon
-        int_pt = np.array([int_pt[1], int_pt[0]])
     return int_pt
 
 if __name__ == "__main__":
