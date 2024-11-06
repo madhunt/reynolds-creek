@@ -9,15 +9,14 @@ from obspy.signal.util import util_geo_km, util_lon_lat
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 
-def main(path_home):
-
-    # set parameters (TODO change these to command line inputs)
+def main(debug=False):
+    # TODO change to command line input or something less ugly
     date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
     freqmin = 24.0
     freqmax = 32.0
     freq_str = f"{freqmin}_{freqmax}"
-
     array_list = ['TOP', 'JDNA', 'JDNB', 'JDSA', 'JDSB']
+
     path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
     path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
     path_processed = os.path.join(path_harddrive, "data", "processed")
@@ -26,20 +25,24 @@ def main(path_home):
     path_figures = os.path.join(path_home, "figures")
 
     
+    ##TODO FOR TESTING PURPOSES
+    # choose times when helicopter is moving so we can compare points
+    t0 = '2023-10-07T17:00:00'
+    tf = '2023-10-07T18:30:00'
 
     # initialize empty dfs
     all_ints = pd.DataFrame()
-    all_rays = pd.DataFrame()
+    if debug == True: 
+        all_rays = pd.DataFrame()
 
     # calculate intersections at each timestep for each pair of arrays
     for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         # load in processed data and calculate center point of array (lat, lon)
-        arr1, p1 = load_ray_data(path_processed, arr1_str, date_list, freq_str, path_station_gps)
-        arr2, p2 = load_ray_data(path_processed, arr2_str, date_list, freq_str, path_station_gps)
-        ## change from lat,lon to x,y in km
-        #p1_km = np.array([0, 0])
-        #p2_km = util_geo_km(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
-        #                    lon=p2_latlon[1], lat=p2_latlon[0])
+        arr1, p1 = load_ray_data(path_processed, arr1_str, date_list, freq_str, path_station_gps, 
+                                 t0, tf)
+        arr2, p2 = load_ray_data(path_processed, arr2_str, date_list, freq_str, path_station_gps, 
+                                 t0, tf)
+
         # calculate intersection
         int_pts = pd.DataFrame()
         int_pts['result'] = arr1['Backaz'].combine(arr2['Backaz'], 
@@ -47,18 +50,21 @@ def main(path_home):
         int_pts['Lat'] = [x[0] for x in int_pts['result']]
         int_pts['Lon'] = [x[1] for x in int_pts['result']]
         int_pts.drop('result', axis=1)
-        ## change back to lat/lon from km
-        #int_pts = pd.DataFrame([util_lon_lat(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
-        #                                     x=km[0], y=km[1]) for km in int_pts_km], 
-        #                       columns=['Lon', 'Lat'], index=int_pts_km.index)
         # save intersection points
-        #all_ints.index = int_pts.index
         all_ints[f'{arr1_str}_{arr2_str}_Lat'] = int_pts['Lat']#[col[1] for col in int_pts]
         all_ints[f'{arr1_str}_{arr2_str}_Lon'] = int_pts['Lon']#[col[0] for col in int_pts]
-        # save rays
-        #all_rays.index = arr1.index
-        all_rays[arr1_str] = arr1['Backaz']
-        all_rays[arr2_str] = arr2['Backaz']
+
+        
+        
+        if debug == True: 
+            # save rays
+            all_rays[arr1_str] = arr1['Backaz']
+            all_rays[arr2_str] = arr2['Backaz']
+
+    #TODO how many beams are crossing
+    # this gives LAT AND LON
+    #num_nans = all_ints.isna().sum(axis=1)
+    # weight result by this??
 
     # now find median intersection point
     median_ints = pd.DataFrame(index=int_pts.index)
@@ -67,18 +73,82 @@ def main(path_home):
 
     # load in true helicopter data
     data_heli = adsb_kml_to_df(path_heli)
-    data_heli = data_heli.set_index('Time')
+    #data_heli = data_heli.set_index('Time')
     # resample heli data
+    filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
+    data_heli = filt(data_heli ).set_index('Time')
     data_heli = data_heli[~data_heli.index.duplicated(keep='first')]
-    data_heli = data_heli.resample('30s').nearest()
-    #FIXME change from nearest to something else??
+    data_heli = data_heli.resample('30s').nearest() #TODO make sure nearest is ok -- i think it is
 
-    # only use a subsection of points between times of interest
-    #filt = lambda arr: arr[(arr.index > '2023-10-07T17:45:00') & (arr.index < '2023-10-07T18:00:00')]
-    #median_ints = filt(median_ints)
-    #data_heli = filt(data_heli)
+    # now have an array of triangulated points (median_ints)
+        # and an array of actual points (data_heli)
+        # at the same times (every 30 s during a time when the heli is moving)
+    data_heli = data_heli.rename(columns={'Longitude':'Lon True', 'Latitude':'Lat True'})
+    #def root_mean_square_error(model, measurements):
+    #    #assert len(model) == len(measurements)
+    #    N = len(measurements)
+    #    rmse = np.sqrt(1/N * np.sum((model - measurements)**2))
+    #    return rmse
+    #rmse_lat = root_mean_square_error(data_heli['Lat True'], median_ints['Lat'])
+    #rmse_lon = root_mean_square_error(data_heli['Lon True'], median_ints['Lon'])
 
-    # plot all rays
+    #diff_lat = data_heli['Lat True'] - median_ints['Lat']
+    #print(np.nanmax(diff_lat))
+    #diff_lon = data_heli['Lon True'] - median_ints['Lon']
+    #print(np.nanmax(diff_lon))
+
+    # calculate error
+    error = np.sqrt((data_heli['Lon True'] - median_ints['Lon'])**2 
+                    + (data_heli['Lat True'] - median_ints['Lat'])**2)
+    # calculate colors based on number of intersections
+    int_top = all_ints[all_ints.columns[all_ints.columns.str.contains('TOP')]].isna().sum(axis=1) /2 # div by 2 bc lat AND lon
+    int_jd = all_ints[all_ints.columns[~all_ints.columns.str.contains('TOP')]].isna().sum(axis=1) /2
+    red = int_top / 4      # max # of intersections is each JD with TOP, or 4 total
+    blue = int_jd / 6        # max # is each JD with each other
+    green = np.zeros(shape=np.shape(red))
+    colors = np.vstack([red, green, blue]).T
+    #colors = colors[:len(data_heli)]            #TODO remove these len data helis from everywhere and clean up
+    
+    fig, ax = plt.subplots(1, 1)
+    ax.scatter(data_heli['Lon True'][20:25], data_heli['Lat True'][20:25],
+               s=5000* error[:len(data_heli)][20:25], c=colors[:len(data_heli)][20:25])
+    # plot some landmarks
+    for arr in array_list:
+        y, x, _  = station_coords_avg(path_station_gps, arr)
+        plt.plot(x, y, 'g^')
+    #ax.scatter(data_heli['Lon True'], data_heli['Lat True'], 'ko'
+    #           s=)
+    
+    plt.savefig('temp.png')
+    #plt.show()
+    plt.close()
+
+
+
+
+
+    if debug == True:
+        # plot backaz rays and intersection points
+        debug_ray_plot(path_station_gps, path_figures, array_list,
+                       all_ints, all_rays, median_ints, data_heli)
+    
+
+    # quantify uncertainty -- difference in true and calculated heli location
+    
+
+    # loop through time and plot backaz rays at each time
+    # also get waveforms
+        ##TODO
+        # plot waveforms / pwr for each array (median?)
+        # waveform for TOP? 
+
+
+
+    return
+
+
+def debug_ray_plot(path_station_gps, path_figures, array_list, 
+                   all_ints, all_rays, median_ints, data_heli):
     for i, row in enumerate(all_rays.iterrows()):
         fig, ax = plt.subplots(1, 1, tight_layout=True)
         colors = cm.winter(np.linspace(0, 1, 5))
@@ -103,19 +173,19 @@ def main(path_home):
         for k in np.arange(0, 20, 2):
             t = row[0]
             ax.scatter(all_ints.loc[t][k+1], all_ints.loc[t][k],
-                       c='green', marker='o')
+                    c='green', marker='o')
 
         # plot median point
         med_lat = median_ints.loc[t]['Lat']
         med_lon = median_ints.loc[t]['Lon']
         ax.plot(med_lon, med_lat, c='orange', marker='*', 
-                   markersize=10, label='Median Intersection')
+                markersize=10, label='Median Intersection')
 
         # plot helicopter "true" point
         heli_lat = data_heli.loc[t]['Latitude']
         heli_lon = data_heli.loc[t]['Longitude']
         ax.plot(heli_lon, heli_lat, c='red', marker='*', 
-                   markersize=10, label='True Heli Location')
+                markersize=10, label='True Heli Location')
 
         ax.legend(loc='upper left')
         ax.set_xlim([-116.85, -116.74])
@@ -126,19 +196,7 @@ def main(path_home):
         print(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"))
         plt.savefig(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"), dpi=500)
         plt.close()
-        #plt.show()
-    # loop through time and plot backaz rays at each time
-   # print('plot time')
-    # also get waveforms
-        ##TODO
-        # plot waveforms / pwr for each array (median?)
-        # waveform for TOP? 
-
-
-
     return
-
-
 
 
 #def basic_main(path_home):
@@ -221,7 +279,6 @@ def adsb_kml_to_df(path):
     # do some cleanup
     data_all = data_all.sort_values("Time").drop_duplicates()
 
-
     return data_all
     
 def station_coords_avg(path_gps, array_str):
@@ -263,7 +320,7 @@ def helicoords_to_az(path_station_gps, data, array_str):
 
     return data
 
-def load_ray_data(path_processed, array_str, date_list, freq_str, path_gps):
+def load_ray_data(path_processed, array_str, date_list, freq_str, path_gps, t0, tf):
     # load processed infrasound data
     output = pd.DataFrame()
     for date_str in date_list:
@@ -271,10 +328,10 @@ def load_ray_data(path_processed, array_str, date_list, freq_str, path_gps):
         output_tmp = pd.read_pickle(file)
         output = pd.concat([output, output_tmp])
     
-    output = output.set_index('Time')
+    #output = output.set_index('Time')
     
-    #filt = lambda arr: arr[(arr['Time'] > '2023-10-07T17:00:00') & (arr['Time'] < '2023-10-07T18:30:00')]
-    #output = filt(output).set_index('Time')
+    filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
+    output = filt(output).set_index('Time')
 
     # add column for angle (0 deg at x-axis, 90 deg at y-axis)
     #output['Angle'] = (-1 * output['Backaz'] + 90)%360
@@ -339,5 +396,5 @@ if __name__ == "__main__":
     path_curr = os.path.dirname(os.path.realpath(__file__))
     path_home = os.path.abspath(os.path.join(path_curr, '..'))
 
-    main(path_home=path_home)
+    main(debug=True)
     #basic_main(path_home=path_home)

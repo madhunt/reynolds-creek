@@ -13,9 +13,9 @@ import triangulate
 def main():
     # figure with all array backaz in subplots
     # set parameters (TODO change these to command line inputs)
-    date_list = ["2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
-    freqmin = 24.0
-    freqmax = 32.0
+    date_list = ["2023-10-6", "2023-10-7"]#, "2023-10-6"]#, "2023-10-5"]
+    freqmin = 2.0
+    freqmax = 8.0
 
     # FIXME this is ugly but not as bad as it once was
     path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
@@ -40,7 +40,7 @@ def plot_backaz_heli_allarrays(path_heli, path_processed, path_station_gps,
     RETURNS:
     '''
     array_list = ["TOP", "JDNA", "JDNB", "JDSA", "JDSB"]
-    subtitle_list = ["TOP (44 sensors)", "JDNA (4 sensors)", "JDNB (4 sensors)", 
+    subtitle_list = ["TOP (42 sensors)", "JDNA (3 sensors)", "JDNB (3 sensors)", 
                      "JDSA (4 sensors)", "JDSB (4 sensors)"]
 
     fig, ax = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=[12,9])
@@ -81,7 +81,11 @@ def plot_backaz_heli_allarrays(path_heli, path_processed, path_station_gps,
 
         # PLOT HELICOPTER DATA
         ax[i].plot(data_heli.index, data_heli['Masked Azimuth'], '-', color='red', 
-                alpha=0.6, label="Helicopter,\nrelative\nto array")
+                alpha=0.6)
+        if i == 0:
+            # make sure one axis has a label for legend entry
+            ax[i].plot(data_heli.index, data_heli['Masked Azimuth'], '-', color='red', 
+                    alpha=0.6, label="Helicopter,\nrelative\nto array")
 
         # SUBPLOT FORMATTING
         ax[i].set_title(subtitle_list[i], fontsize=12)
@@ -91,36 +95,32 @@ def plot_backaz_heli_allarrays(path_heli, path_processed, path_station_gps,
     
     # AXIS-SPECIFIC FORMATTING
     # add legend outside axes on top subplot
-    ax[0].legend(bbox_to_anchor=(1.0, 0.35), 
-                    fancybox=False, framealpha=1.0, 
-                    edgecolor="black", fontsize=12)
+    fig.legend(fancybox=False, framealpha=1.0, 
+               edgecolor="black", fontsize=12)
     # add y-label on middle subplot
     ax[2].set_ylabel('Backazimuth [$^o$]', fontsize=12)
     # format x-axis on bottom subplot
-    ax[4].set_xlabel("Local Time (US/Mountain)", fontsize=12)
-    time_min = datetime.datetime(year=2023, month=10, day=7, hour=9, minute=0, tzinfo=pytz.timezone("US/Mountain"))
-    time_max = datetime.datetime(year=2023, month=10, day=7, hour=14, minute=0, tzinfo=pytz.timezone("US/Mountain"))
+    ax[4].set_xlabel("Local Time (US/Mountain) on 2023-10-06", fontsize=12)
+
+    # set time axis limits
+    time_min = datetime.datetime(year=2023, month=10, day=6, hour=8, minute=0, tzinfo=pytz.timezone("US/Mountain"))
+    time_max = datetime.datetime(year=2023, month=10, day=6, hour=19, minute=0, tzinfo=pytz.timezone("US/Mountain"))
     ax[4].set_xlim([time_min, time_max])
     ax[4].xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=1, tz=pytz.timezone("US/Mountain")))
-    # FIXME FIXME mdates is using the CURRENT date to localize this timezone, so currently (06 Sept)
-        # it thinks we are in dst (datetime.datetime.now(tz=pytz.timezone("US/Mountain")).dst() = 3600 seconds)
-        # so the entire plot is shifted later by an hour
-        # this code will work correctly if I run it in October
-        # datetime is stupid
     ax[4].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz=pytz.timezone("US/Mountain")))
 
     # FIGURE FORMATTING
-    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth, Filtered {freqmin}-{freqmax} Hz, 2023-10-07", 
+    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth\nFiltered {freqmin}-{freqmax} Hz, 2023-10-06", 
                  fontsize=16)
     fig.tight_layout()
     # add colorbar across all subplots
     fig.subplots_adjust(right=0.87)
-    cbar_ax = fig.add_axes([0.9, 0.15, 0.02, 0.6])
+    cbar_ax = fig.add_axes([0.9, 0.17, 0.02, 0.6])
     cbar = fig.colorbar(im, cax=cbar_ax, aspect=12)
     cbar.set_label("Semblance", fontsize=12)
 
     # SAVE FIGURE
-    plt.savefig(os.path.join(path_figures, f"backaz_allarrays_10-07_{freq_str}.png"), dpi=500)
+    plt.savefig(os.path.join(path_figures, f"backaz_allarrays_{freq_str}.png"), dpi=500)
     plt.close()
     return
 

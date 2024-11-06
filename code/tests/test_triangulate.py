@@ -33,6 +33,10 @@ def test_triangulate():
     path_station_gps = os.path.join(path_harddrive, "data", "gps")
     path_figures = os.path.join(path_home, "figures")
 
+
+    # call triangulate with debug flag on
+
+
     # initialize empty dfs
     all_ints = pd.DataFrame()
     all_rays = pd.DataFrame()
