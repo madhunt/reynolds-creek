@@ -3,9 +3,12 @@ code/__pycache__
 test.py
 testing.py
 data/
-figures/
+figures/*
 data/processed/
 gis/
 log/
 *.pyc
 */archive/
+
+
+!figures/burn_severity_map.png
