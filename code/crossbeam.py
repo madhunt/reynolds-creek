@@ -6,11 +6,13 @@ and number of total intersections/crossbeams at each timestep.
 Re-samples "true" helicopter data during same time period.
 Calculates distance between true helicopter point and median intersection.
 '''
-import os, datetime, glob, pytz, itertools, xmltodict, utm
+import os, datetime, pytz, itertools, utm
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
+
+import utils
 
 def main(path_processed, path_heli, path_station_gps, path_output,
          t0, tf, freqmin, freqmax):
@@ -32,7 +34,7 @@ def main(path_processed, path_heli, path_station_gps, path_output,
     median_ints['Num JD Int'] = all_ints[all_ints.columns[~all_ints.columns.str.contains("TOP")]].notna().sum(axis=1) / 2
 
     # load in true helicopter data as UTM coordinates
-    data_heli = adsb_kml_to_df(path_heli, latlon=False)
+    data_heli = utils.adsb_kml_to_df(path_heli, latlon=False)
     # resample heli data
     filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
     data_heli = filt(data_heli ).set_index('Time')
@@ -54,119 +56,6 @@ def main(path_processed, path_heli, path_station_gps, path_output,
     return
 
 
-def adsb_kml_to_df(path, latlon=True):
-    '''
-    Loads in aircraft flight track (downloaded from ADS-B Exchange https://globe.adsbexchange.com/) 
-    from KML as a pandas dataframe.  
-    INPUTS: 
-        path    : str   : Path to dir containing all KML files for one aircraft of interest.
-        latlon  : bool  : If True, returns data as latitude and longitudes. If False, returns 
-            data as UTM coordinates. 
-    RETURNS: 
-        data_latlon : pandas df : Dataframe containing data from all KML files in specified dir. Columns are 
-                    Time        : datetime  : Timestamp of location reading
-                    Latitude    : float     : Latitude of aircraft
-                    Longitude   : float     : Longitude of aircraft
-                    Altitude    : float     : Altitude of aircraft
-        OR
-        data_utm    : pandas df : Dataframe containing data from all KML files in specified dir. Columns are
-                    Time        : datetime  : Timestamp of location reading
-                    Easting     : float     : UTM Easting of aircraft
-                    Northing    : float     : UTM Northing of aircraft
-                    Altitude    : float     : Altitude of aircraft
-
-    '''
-    files_kml = glob.glob(os.path.join(path, "*.kml" ))
-    data_latlon = pd.DataFrame()
-
-    for file in files_kml:
-        data = pd.DataFrame()
-        with open(file, 'r') as file:
-            xml_str = file.read()
-        xml_dict = xmltodict.parse(xml_str)
-        data_raw = xml_dict['kml']['Folder']['Folder']['Placemark']['gx:Track']
-
-        # add data to pandas array 
-        data['Time'] = pd.to_datetime(data_raw['when'])
-        data['coord'] = data_raw['gx:coord']
-        data[['Longitude', 'Latitude', 'Altitude']] = data['coord'].str.split(' ', 
-                                                                              n=2, expand=True).astype(float)
-        data = data.drop('coord', axis=1)   # clean up temp column
-        # store data from multiple files
-        data_latlon = pd.concat([data_latlon, data])
-    
-    # do some cleanup
-    data_latlon = data_latlon.sort_values("Time").drop_duplicates()
-
-    if latlon == True:
-        return data_latlon
-    else:
-        # convert coordinates to UTM
-        utm_coords = utm.from_latlon(data_latlon['Latitude'].to_numpy(), 
-                                     data_latlon['Longitude'].to_numpy())
-        data_utm = pd.DataFrame(index=data_latlon.index)
-        data_utm['Time'] = data_latlon['Time']
-        data_utm['Easting'] = utm_coords[0]
-        data_utm['Northing'] = utm_coords[1]
-        data_utm['Altitude'] = data_latlon['Altitude']
-        return data_utm
-    
-
-def station_coords_avg(path_gps, array_str, latlon=True):
-    '''
-    Find mean location for entire array. 
-    INPUTS: 
-        path_home : str : Path to main dir.
-        latlon  : bool  : If True, returns data as latitude and longitudes. If False, returns 
-            data as UTM coordinates. 
-    RETURNS:
-        lat : float : Average latitude for station.
-        lon : float : Average longitude for station.
-        elv : float : Average elevation for station.
-    '''
-    # TODO FIXME path
-    path_coords = glob.glob(os.path.join(path_gps, "*.csv" ))
-    coords = pd.DataFrame()
-    for file in path_coords:
-        coords = pd.concat([coords, pd.read_csv(file)])
-    # filter by array
-    coords = coords[coords["Station"].str.contains(array_str)]
-
-    lat = coords['Latitude'].mean()
-    lon = coords['Longitude'].mean()
-
-    if latlon == True:
-        return lat, lon
-    else:
-        # convert coordinates to UTM
-        utm_coords = utm.from_latlon(lat, lon)
-        easting = utm_coords[0]
-        northing = utm_coords[1]
-        return easting, northing
-
-
-def load_ray_data(path_processed, array_str, freq_str, t0, tf):
-    # load processed infrasound data between given dates
-    output = pd.DataFrame()
-    for date_str in create_date_list(t0, tf):
-        file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
-        output_tmp = pd.read_pickle(file)
-        output = pd.concat([output, output_tmp])
-    
-    # now filter data between given times
-    filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
-    output = filt(output).set_index('Time')
-    return output
-
-
-def create_date_list(t0, tf):
-    def date_to_str(datetime_obj):
-        return datetime_obj.strftime(format="%Y-%m-%-d")
-    # include start and end dates in list
-    date_list = [t0.date() + datetime.timedelta(days=i) for i in range((tf-t0).days + 1)]
-    # format as str
-    date_list = [date_to_str(i) for i in date_list]
-    return date_list
 
 
 def intersection(p1, a1, p2, a2, latlon=True):
@@ -227,11 +116,11 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
     for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         # load in processed data
         freq_str = f"{freqmin}_{freqmax}"
-        arr1 = load_ray_data(path_processed, arr1_str, freq_str, t0, tf)
-        arr2 = load_ray_data(path_processed, arr2_str, freq_str, t0, tf)
+        arr1 = utils.load_backaz_data(path_processed, arr1_str, freq_str, t0, tf)
+        arr2 = utils.load_backaz_data(path_processed, arr2_str, freq_str, t0, tf)
         # calculate center point of arrays (lat, lon)
-        p1 = station_coords_avg(path_station_gps, arr1_str, latlon=True)
-        p2 = station_coords_avg(path_station_gps, arr2_str, latlon=True)
+        p1 = utils.station_coords_avg(path_station_gps, arr1_str, latlon=True)
+        p2 = utils.station_coords_avg(path_station_gps, arr2_str, latlon=True)
 
         # save rays (for plotting)
         all_rays[arr1_str] = arr1['Backaz']
@@ -263,7 +152,6 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
     return all_ints, all_rays
 
 
-
 #FIXME should move this function to another file or remove entirely
 def debug_ray_plot(path_station_gps, path_figures, array_list, 
                    all_ints, all_rays, median_ints, data_heli):
@@ -272,7 +160,7 @@ def debug_ray_plot(path_station_gps, path_figures, array_list,
         colors = cm.winter(np.linspace(0, 1, 5))
         for j, arr_str in enumerate(array_list):
             # get initial point, slope, and y-intercept of ray
-            p = station_coords_avg(path_station_gps, arr_str)
+            p = utils.station_coords_avg(path_station_gps, arr_str)
             a = row[1][arr_str]
             m = 1 / np.tan(np.deg2rad(a))
             b = p[0] - p[1]*m

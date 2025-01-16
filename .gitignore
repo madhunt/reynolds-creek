@@ -8,3 +8,4 @@ data/processed/
 gis/
 log/
 *.pyc
+*/archive/

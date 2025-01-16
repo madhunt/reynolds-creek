@@ -1,9 +1,13 @@
 #!/usr/bin/python3
+'''
+Utility functions used across different files.
+'''
 
-import glob, obspy, os
+import glob, obspy, os, glob, xmltodict
 import pandas as pd
 from datetime import datetime, timedelta
 from obspy.core.util import AttribDict
+import matplotlib.colors as colors
 
 def load_data(path_data, path_coords, array_str=None,
               gem_include=None, gem_exclude=None,
@@ -100,4 +104,133 @@ def arg_split_comma(arg):
     else:
         # return None
         return arg
+
+
+def load_backaz_data(path_processed, array_str, freq_str, t0, tf):
+    # load processed infrasound data between given dates
+    output = pd.DataFrame()
+    for date_str in create_date_list(t0, tf):
+        file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
+        output_tmp = pd.read_pickle(file)
+        output = pd.concat([output, output_tmp])
     
+    # now filter data between given times
+    filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
+    output = filt(output).set_index('Time')
+    return output
+
+def create_date_list(t0, tf):
+    def date_to_str(datetime_obj):
+        return datetime_obj.strftime(format="%Y-%m-%-d")
+    # include start and end dates in list
+    date_list = [t0.date() + datetime.timedelta(days=i) for i in range((tf-t0).days + 1)]
+    # format as str
+    date_list = [date_to_str(i) for i in date_list]
+    return date_list
+
+
+
+
+def adsb_kml_to_df(path, latlon=True):
+    '''
+    Loads in aircraft flight track (downloaded from ADS-B Exchange https://globe.adsbexchange.com/) 
+    from KML as a pandas dataframe.  
+    INPUTS: 
+        path    : str   : Path to dir containing all KML files for one aircraft of interest.
+        latlon  : bool  : If True, returns data as latitude and longitudes. If False, returns 
+            data as UTM coordinates. 
+    RETURNS: 
+        data_latlon : pandas df : Dataframe containing data from all KML files in specified dir. Columns are 
+                    Time        : datetime  : Timestamp of location reading
+                    Latitude    : float     : Latitude of aircraft
+                    Longitude   : float     : Longitude of aircraft
+                    Altitude    : float     : Altitude of aircraft
+        OR
+        data_utm    : pandas df : Dataframe containing data from all KML files in specified dir. Columns are
+                    Time        : datetime  : Timestamp of location reading
+                    Easting     : float     : UTM Easting of aircraft
+                    Northing    : float     : UTM Northing of aircraft
+                    Altitude    : float     : Altitude of aircraft
+
+    '''
+    files_kml = glob.glob(os.path.join(path, "*.kml" ))
+    data_latlon = pd.DataFrame()
+
+    for file in files_kml:
+        data = pd.DataFrame()
+        with open(file, 'r') as file:
+            xml_str = file.read()
+        xml_dict = xmltodict.parse(xml_str)
+        data_raw = xml_dict['kml']['Folder']['Folder']['Placemark']['gx:Track']
+
+        # add data to pandas array 
+        data['Time'] = pd.to_datetime(data_raw['when'])
+        data['coord'] = data_raw['gx:coord']
+        data[['Longitude', 'Latitude', 'Altitude']] = data['coord'].str.split(' ', 
+                                                                              n=2, expand=True).astype(float)
+        data = data.drop('coord', axis=1)   # clean up temp column
+        # store data from multiple files
+        data_latlon = pd.concat([data_latlon, data])
+    
+    # do some cleanup
+    data_latlon = data_latlon.sort_values("Time").drop_duplicates()
+
+    if latlon == True:
+        return data_latlon
+    else:
+        # convert coordinates to UTM
+        utm_coords = utm.from_latlon(data_latlon['Latitude'].to_numpy(), 
+                                     data_latlon['Longitude'].to_numpy())
+        data_utm = pd.DataFrame(index=data_latlon.index)
+        data_utm['Time'] = data_latlon['Time']
+        data_utm['Easting'] = utm_coords[0]
+        data_utm['Northing'] = utm_coords[1]
+        data_utm['Altitude'] = data_latlon['Altitude']
+        return data_utm
+    
+
+def station_coords_avg(path_gps, array_str, latlon=True):
+    '''
+    Find mean location for entire array. 
+    INPUTS: 
+        path_home : str : Path to main dir.
+        latlon  : bool  : If True, returns data as latitude and longitudes. If False, returns 
+            data as UTM coordinates. 
+    RETURNS:
+        lat : float : Average latitude for station.
+        lon : float : Average longitude for station.
+        elv : float : Average elevation for station.
+    '''
+    # TODO FIXME path
+    path_coords = glob.glob(os.path.join(path_gps, "*.csv" ))
+    coords = pd.DataFrame()
+    for file in path_coords:
+        coords = pd.concat([coords, pd.read_csv(file)])
+    # filter by array
+    coords = coords[coords["Station"].str.contains(array_str)]
+
+    lat = coords['Latitude'].mean()
+    lon = coords['Longitude'].mean()
+
+    if latlon == True:
+        return lat, lon
+    else:
+        # convert coordinates to UTM
+        utm_coords = utm.from_latlon(lat, lon)
+        easting = utm_coords[0]
+        northing = utm_coords[1]
+        return easting, northing
+
+
+
+
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    # copied from a helpful stack overflow comment
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+    
+
+
+
