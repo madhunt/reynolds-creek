@@ -1,14 +1,15 @@
+# exclude
 .vscode
+*.pyc
 code/__pycache__
-test.py
-testing.py
+code/.pytest_cache
+code/archive
 data/
-figures/*
-data/processed/
 gis/
 log/
-*.pyc
-*/archive/
+figures/*
 
-
+# include select figures to put in README
 !figures/burn_severity_map.png
+!figures/backaz_and_heli_24.0-32.0Hz.png
+!figures/backaz_and_heli_2.0-8.0Hz.png
