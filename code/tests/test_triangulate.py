@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from obspy.signal.util import util_geo_km, util_lon_lat
 # import from personal scripts
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import triangulate
+import code.crossbeam as crossbeam
 
 def test_triangulate():
     '''
@@ -43,8 +43,8 @@ def test_triangulate():
     # calculate intersections at each timestep for each pair of arrays
     for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         # load in processed data and calculate center point of array (lat, lon)
-        arr1, p1_latlon = triangulate.load_ray_data(path_processed, arr1_str, date_list, freq_str, path_station_gps)
-        arr2, p2_latlon = triangulate.load_ray_data(path_processed, arr2_str, date_list, freq_str, path_station_gps)
+        arr1, p1_latlon = crossbeam.load_ray_data(path_processed, arr1_str, date_list, freq_str, path_station_gps)
+        arr2, p2_latlon = crossbeam.load_ray_data(path_processed, arr2_str, date_list, freq_str, path_station_gps)
         # change from lat,lon to x,y in km
         #p1_km = np.array([0, 0])
         #p2_km = util_geo_km(orig_lon=p1_latlon[1], orig_lat=p1_latlon[0], 
@@ -59,7 +59,7 @@ def test_triangulate():
         p1 = [p1_latlon[1], p1_latlon[0]]
         p2 = [p2_latlon[1], p2_latlon[0]]
         int_pts_result = arr1['Backaz'].combine(arr2['Backaz'], 
-                                           (lambda a1, a2: triangulate.intersection(p1, a1, p2, a2)))
+                                           (lambda a1, a2: crossbeam.intersection(p1, a1, p2, a2)))
         int_pts = pd.DataFrame(index=int_pts_result.index)
         int_pts['Lon'] = [x[0] for x in int_pts_result]
         int_pts['Lat'] = [x[1] for x in int_pts_result]
@@ -88,7 +88,7 @@ def test_triangulate():
         #p0 = triangulate.station_coords_avg(path_station_gps, 'TOP')
         for j, arr_str in enumerate(array_list):
             # get initial point, slope, and y-intercept of ray
-            p = triangulate.station_coords_avg(path_station_gps, arr_str)
+            p = crossbeam.station_coords_avg(path_station_gps, arr_str)
             #p_km = util_geo_km(orig_lon=p0[1], orig_lat=p0[0], 
             #                    lon=p[1], lat=p[0])
             a = ray_row[1][arr_str]

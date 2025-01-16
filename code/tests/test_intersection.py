@@ -3,7 +3,7 @@ import pytest, sys, os
 import numpy as np
 # import from personal scripts
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import triangulate
+import code.crossbeam as crossbeam
 
 def test_intersection():
     '''
@@ -18,7 +18,7 @@ def test_intersection():
             test_dict   : dict  : Contains p1, a1, p2, a2 of test rays, and manually calculated 
                 intersection (int_x, int_y).
         '''
-        int_pt = triangulate.intersection(test_dict['p1'], test_dict['a1'], test_dict['p2'], test_dict['a2'])
+        int_pt = crossbeam.intersection(test_dict['p1'], test_dict['a1'], test_dict['p2'], test_dict['a2'])
 
         if np.isnan(test_dict['int_x']) and np.isnan(test_dict['int_y']):
             assert np.isnan(int_pt[0])
