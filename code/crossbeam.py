@@ -12,6 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 
+import settings
 import utils
 
 def main(path_processed, path_heli, path_station_gps, path_output,
@@ -206,15 +207,6 @@ def debug_ray_plot(path_station_gps, path_figures, array_list,
 
 
 if __name__ == "__main__":
-    # define paths
-    path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
-    path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
-
-    path_processed = os.path.join(path_harddrive, "data", "processed")
-    path_heli = os.path.join(path_harddrive, "data", "helicopter")
-    path_station_gps = os.path.join(path_harddrive, "data", "gps")
-    path_output = os.path.join(path_harddrive, "data", "output")
-    
     # choose times when helicopter is moving so we can compare points
     # TIMES FOR 24-32 HZ
     #freqmin = 24.0
@@ -227,5 +219,6 @@ if __name__ == "__main__":
     t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
     tf = datetime.datetime(2023, 10, 6, 21, 0, 0, tzinfo=pytz.UTC)
 
-    main(path_processed, path_heli, path_station_gps, path_output,
+    main(settings.path_processed, settings.path_heli, 
+         settings.path_station_gps, settings.path_output,
          t0, tf, freqmin, freqmax)

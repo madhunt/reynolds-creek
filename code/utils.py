@@ -3,10 +3,12 @@
 Utility functions used across different files.
 '''
 
-import glob, obspy, os, glob, xmltodict
+import glob, obspy, os, glob, xmltodict, utm
 import pandas as pd
-from datetime import datetime, timedelta
+import numpy as np
+import datetime
 from obspy.core.util import AttribDict
+from obspy.geodetics.base import gps2dist_azimuth
 import matplotlib.colors as colors
 
 def load_data(path_data, path_coords, array_str=None,
@@ -111,9 +113,13 @@ def load_backaz_data(path_processed, array_str, freq_str, t0, tf):
     output = pd.DataFrame()
     for date_str in create_date_list(t0, tf):
         file = os.path.join(path_processed, f"processed_output_{array_str}_{date_str}_{freq_str}.pkl")
-        output_tmp = pd.read_pickle(file)
-        output = pd.concat([output, output_tmp])
-    
+        try:
+            output_tmp = pd.read_pickle(file)
+            output = pd.concat([output, output_tmp])
+        except FileNotFoundError:
+            # HACK to get around files on 10-08
+            pass
+
     # now filter data between given times
     filt = lambda arr: arr[(arr['Time'] > t0) & (arr['Time'] < tf)]
     output = filt(output).set_index('Time')
@@ -123,7 +129,7 @@ def create_date_list(t0, tf):
     def date_to_str(datetime_obj):
         return datetime_obj.strftime(format="%Y-%m-%-d")
     # include start and end dates in list
-    date_list = [t0.date() + datetime.timedelta(days=i) for i in range((tf-t0).days + 1)]
+    date_list = [t0.date() + datetime.timedelta(days=i) for i in range((tf-t0).days + 2)]
     # format as str
     date_list = [date_to_str(i) for i in date_list]
     return date_list
@@ -135,11 +141,11 @@ def adsb_kml_to_df(path, latlon=True):
     '''
     Loads in aircraft flight track (downloaded from ADS-B Exchange https://globe.adsbexchange.com/) 
     from KML as a pandas dataframe.  
-    INPUTS: 
+    INPUTS 
         path    : str   : Path to dir containing all KML files for one aircraft of interest.
         latlon  : bool  : If True, returns data as latitude and longitudes. If False, returns 
             data as UTM coordinates. 
-    RETURNS: 
+    RETURNS 
         data_latlon : pandas df : Dataframe containing data from all KML files in specified dir. Columns are 
                     Time        : datetime  : Timestamp of location reading
                     Latitude    : float     : Latitude of aircraft
@@ -221,6 +227,28 @@ def station_coords_avg(path_gps, array_str, latlon=True):
         northing = utm_coords[1]
         return easting, northing
 
+
+def coords_to_az(path_station_gps, data, array_str):
+    '''
+    Convert coordinates (in lat/lon) to azimuths relative to the center of 
+    specified array.
+    INPUTS
+        path_station_gps    : str       : Path to csv with GPS coordinates of infrasound stations.
+        data                : pandas df : Data loaded in as lat/lon coordinates.
+        array_str           : str       : Name of array to calculate azimuth from. 
+    RETURNS
+        data                : pandas df : Original dataframe with 'Distance' and 'Azimuth'
+            columns appended on end, representing distance and azimuth from array.
+    '''
+    # find avg location for entire array specified (in lat/lon)
+    coords_top = station_coords_avg(path_station_gps, array_str, latlon=True)
+    # use gps2dist to get distance and azimuth between each coordinate and array of interest
+    data[['Distance', 'Azimuth', 'az2']] = data.apply(lambda x: 
+                                                                gps2dist_azimuth(lat1=coords_top[0], lon1=coords_top[1], 
+                                                                                lat2=x["Latitude"], lon2=x["Longitude"]), 
+                                                                                axis=1, result_type='expand')
+    data = data.drop('az2', axis=1)
+    return data
 
 
 

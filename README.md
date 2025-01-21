@@ -47,7 +47,7 @@ In total, 75 infrasound sensors were deployed in arrays within the burn area and
 
 <figure>
 <p align="center">
-    <img src="figures/backaz_and_heli_2.0-8.0Hz.png" width="500">
+    <img src="figures/backaz_and_heli_2.0-8.0Hz_20231006-15-00_20231007-02-00.png" width="500">
     <figcaption> <i> Backazimuth over time for data filtered between 2-8 Hz, the fire infrasound band. </i> </figcaption>
 </p>
 </figure>
@@ -57,7 +57,7 @@ In total, 75 infrasound sensors were deployed in arrays within the burn area and
 
 <figure>
 <p align="center">
-    <img src="figures/backaz_and_heli_24.0-32.0Hz.png" width="500">
+    <img src="figures/backaz_and_heli_24.0-32.0Hz20231007-16-00)20231007-21-00.png" width="500">
     <figcaption> <i> Backazimuth over time for data filtered between 24-32 Hz, the helicopter infrasound band. </i> </figcaption>
 </p>
 </figure>
