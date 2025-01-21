@@ -12,8 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 
-import settings
-import utils
+import utils, settings
 
 def main(path_processed, path_heli, path_station_gps, path_output,
          t0, tf, freqmin, freqmax):

@@ -1,32 +1,25 @@
 #!/usr/bin/python3
-import os, datetime, pytz
+'''
+Plots results of Monte-Carlo simulations for uncertainty in backazimuth.
+Figures were used on 2025 AGU poster. Calculations were performed with 
+code adapted from beamform.py (see GEOPH 522 project code).
+'''
+import os, datetime, pytz, sys
 import pandas as pd
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import matplotlib.colors as mcolors
 
-import utils
+# import files from dir above
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import utils, settings
 
-def main():
+def main(path_processed_uncert, path_heli, path_station_gps, path_figures,
+         freqmin, freqmax, gps_perturb_scale):
 
-
-    path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
-    path_figures = os.path.join(path_home, "figures")
-    path_harddrive = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
-    path_heli = os.path.join(path_harddrive, "data", "helicopter")
-    path_output = os.path.join(path_harddrive, "geoph522")
-    path_station_gps = os.path.join(path_harddrive, "data", "gps")    
-    freqmin = 24
-    freqmax = 32
-    gps_perturb_scale = 0.2 # m
-    
-    array_list = ["TOP", 
-                  "JDSA", 
-                  "JDNA", 
-                  "JDNB", 
-                  "JDSB"]
+    # define arrays and plot subtitles
+    array_list = ["TOP", "JDSA", "JDNA", "JDNB", "JDSB"]
     subtitle_list = ["TOP (200x140 m, 44 sensors)", 
                      "JDSA (15x14 m, 3 sensors)", 
                      "JDNA (8.5x7 m, 4 sensors)", 
@@ -38,7 +31,7 @@ def main():
 
     for i, array_str in enumerate(array_list):
         # LOAD PROCESSED BACKAZIMUTH DATA
-        path_files = glob.glob(os.path.join(path_output, f"output_{array_str}_gps_{gps_perturb_scale}*"))
+        path_files = glob.glob(os.path.join(path_processed_uncert, f"output_{array_str}_gps_{gps_perturb_scale}*"))
         output_all = np.empty(shape=[179, 5, len(path_files)])
         for j, file in enumerate(path_files):
             output = np.load(file)
@@ -48,7 +41,6 @@ def main():
         # output contains 5 columns (Time, Semblance, Abs Power, Backaz, Slowness)
         output_mean = np.mean(output_all, axis=2)
         output_std = np.std(output_all, axis=2)
-        
 
         # plot boxplot
         ax[i,1].boxplot(output_std[:,3], vert=False, widths=0.7,
@@ -78,7 +70,7 @@ def main():
         # LOAD HELICOPTER TRACK DATA
         data = utils.adsb_kml_to_df(path_heli, latlon=True)
         # convert heli coords to dist/azimuth from current array
-        data_heli = utils.helicoords_to_az(path_station_gps, data, array_str)
+        data_heli = utils.coords_to_az(path_station_gps, data, array_str)
         # mask data points at the end of a long data gap (for plotting purposes)
         data_heli['Masked Azimuth'] = np.ma.masked_where(data_heli["Time"].diff() > datetime.timedelta(minutes=15), 
                                                          data_heli["Azimuth"])
@@ -141,22 +133,19 @@ def main():
                bbox_to_anchor=(0.4,0.05), reverse=True)
 
     # SAVE FIGURE
-    plt.savefig(os.path.join(path_figures, f"uncertainty_{gps_perturb_scale}m.png"), dpi=500)
+    plt.savefig(os.path.join(path_figures, f"backaz_uncertainty_{gps_perturb_scale}m.png"), dpi=500)
     plt.close()
-    return
-
-def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
-    # copied from a helpful stack overflow comment
-    new_cmap = mcolors.LinearSegmentedColormap.from_list(
-        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
-    return new_cmap
- 
-
-    # histogram with difference between known location and beamformed location
-
     return
 
 
 if __name__ =="__main__":
-    main()
+    # settings
+    freqmin = 24.0
+    freqmax = 32.0
+    gps_perturb_scale = 3 # m
+
+    main(settings.path_processed_uncert, 
+         settings.path_heli,
+         settings.path_station_gps,
+         settings.path_figures,
+         freqmin, freqmax, gps_perturb_scale)

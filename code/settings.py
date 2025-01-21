@@ -13,3 +13,6 @@ path_heli = os.path.join(path_harddrive, "data", "helicopter")
 path_station_gps = os.path.join(path_harddrive, "data", "gps")
 path_output = os.path.join(path_harddrive, "data", "output")
 path_figures = os.path.join(path_home, "figures")
+
+
+path_processed_uncert = os.path.join(path_harddrive, "geoph522")

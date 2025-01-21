@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import utils, plot_utils
+import utils, plot_code.plot_utils
 import argparse, datetime, os
 import shutil
 from obspy.io.mseed.util import shift_time_of_file

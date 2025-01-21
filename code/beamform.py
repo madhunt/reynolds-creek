@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import plot_utils, utils
 import argparse, math, os, datetime
 import numpy as np
 import pandas as pd
@@ -9,6 +8,8 @@ from obspy.core.utcdatetime import UTCDateTime
 from obspy.signal.array_analysis import array_processing
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib.dates import num2date
+
+import utils, plot_utils
 
 def main(path_home, process=False, 
          array_str=None,
