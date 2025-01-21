@@ -5,14 +5,21 @@ Array processing code and results from infrasound data collected at the Reynolds
 ## Repository Overview
 
 **`code/`**
-    &nbsp;&nbsp;&nbsp;&nbsp;`plot_code/`: Scripts to create figures.
-    &nbsp;&nbsp;&nbsp;&nbsp;`sbatch_scripts/`: Scripts to run processing code in parallel. These are used on BSU's high-performance computing cluster, Borah.
-    &nbsp;&nbsp;&nbsp;&nbsp;`tests/`: Scripts to test various functions.
-    &nbsp;&nbsp;&nbsp;&nbsp;`beamform.py`: Code with command-line interface to process data using the obspy `array_processing()` function.
-    &nbsp;&nbsp;&nbsp;&nbsp;`crossbeam.py`: Uses data processed with `beamform.py`, and corssbeams to find intersection points between all 5 arrays (TOP, JD*).
-    &nbsp;&nbsp;&nbsp;&nbsp;`preprocess.py`: Code with command-line interface to pre-process data before using `beamform.py`.
-    &nbsp;&nbsp;&nbsp;&nbsp;`settings.py`: List of path variables used by other files. These should be changed before running this code.
-    &nbsp;&nbsp;&nbsp;&nbsp;`utils.py`: Utility functions used by other files.
+&nbsp;&nbsp;&nbsp;&nbsp;`plot_code/`: Scripts to create figures.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`sbatch_scripts/`: Scripts to run processing code in parallel. These are used on BSU's high-performance computing cluster, Borah.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`tests/`: Scripts to test various functions.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`beamform.py`: Code with command-line interface to process data using the obspy `array_processing()` function.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`crossbeam.py`: Uses data processed with `beamform.py`, and corssbeams to find intersection points between all 5 arrays (TOP, JD*).
+
+&nbsp;&nbsp;&nbsp;&nbsp;`preprocess.py`: Code with command-line interface to pre-process data before using `beamform.py`.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`settings.py`: List of path variables used by other files. These should be changed before running this code.
+
+&nbsp;&nbsp;&nbsp;&nbsp;`utils.py`: Utility functions used by other files.
 
 **`figures/`** Includes a few sample figures produced by the code and shown here in the README.
 
