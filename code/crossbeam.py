@@ -50,15 +50,14 @@ def main(path_processed, path_heli, path_station_gps, path_output,
                                       (median_ints['True Northing'] - median_ints['Northing'])**2)
 
     # save median_ints dataframe (to make figures in another file)
-    timestr = lambda t: t.strftime("%Y%m%d-%H-%M")
-    filename = f"median_intersections_{freqmin}-{freqmax}Hz_{timestr(t0)}_{timestr(tf)}.csv"
-    median_ints.to_csv(os.path.join(path_output, filename))
-    return
+    if path_output != None:
+        timestr = lambda t: t.strftime("%Y%m%d-%H-%M")
+        filename = f"median_intersections_{freqmin}-{freqmax}Hz_{timestr(t0)}_{timestr(tf)}.csv"
+        median_ints.to_csv(os.path.join(path_output, filename))
+    return median_ints, all_ints, all_rays
 
 
-
-
-def intersection(p1, a1, p2, a2, latlon=True):
+def intersection(p1, a1, p2, a2, latlon=False):
     '''
     Calculates intersection point between two rays, given starting points and azimuths (from N).
     INPUTS
@@ -119,8 +118,8 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
         arr1 = utils.load_backaz_data(path_processed, arr1_str, freq_str, t0, tf)
         arr2 = utils.load_backaz_data(path_processed, arr2_str, freq_str, t0, tf)
         # calculate center point of arrays (lat, lon)
-        p1 = utils.station_coords_avg(path_station_gps, arr1_str, latlon=True)
-        p2 = utils.station_coords_avg(path_station_gps, arr2_str, latlon=True)
+        p1 = utils.station_coords_avg(path_station_gps, arr1_str, latlon=False)
+        p2 = utils.station_coords_avg(path_station_gps, arr2_str, latlon=False)
 
         # save rays (for plotting)
         all_rays[arr1_str] = arr1['Backaz']
@@ -129,21 +128,21 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
         # calculate intersection
         int_pts = pd.DataFrame()
         int_pts['result'] = arr1['Backaz'].combine(arr2['Backaz'], 
-                                           (lambda a1, a2: intersection(p1, a1, p2, a2, latlon=True)))
-        int_pts['Lat'] = [x[0] for x in int_pts['result']]
-        int_pts['Lon'] = [x[1] for x in int_pts['result']]
+                                           (lambda a1, a2: intersection(p1, a1, p2, a2, latlon=False)))
+        int_pts['Easting'] = [x[0] for x in int_pts['result']]
+        int_pts['Northing'] = [x[1] for x in int_pts['result']]
         int_pts = int_pts.drop('result', axis=1)      # clean up temp column
         
         # convert points from lat/lon to UTM
-        int_pts_notna = int_pts[int_pts['Lat'].notna()]             # remove nans
-        int_pts_notna = int_pts_notna[int_pts_notna['Lat'] <= 80]   # remove outliers
-        int_pts_utm = utm.from_latlon(int_pts_notna['Lat'].to_numpy(), int_pts_notna['Lon'].to_numpy())
-        # match points with time index in df
-        int_pts_notna['Easting'] = int_pts_utm[0]
-        int_pts_notna['Northing'] = int_pts_utm[1]
+        #int_pts_notna = int_pts[int_pts['Lat'].notna()]             # remove nans
+        #int_pts_notna = int_pts_notna[int_pts_notna['Lat'] <= 80]   # remove outliers
+        #int_pts_utm = utm.from_latlon(int_pts_notna['Lat'].to_numpy(), int_pts_notna['Lon'].to_numpy())
+        ## match points with time index in df
+        #int_pts_notna['Easting'] = int_pts_utm[0]
+        #int_pts_notna['Northing'] = int_pts_utm[1]
         # add back to df that includes NaN values
-        int_pts['Easting'] = int_pts_notna['Easting']
-        int_pts['Northing'] = int_pts_notna['Northing']
+        #int_pts['Easting'] = int_pts_notna['Easting']
+        #int_pts['Northing'] = int_pts_notna['Northing']
 
         # save intersection points in larger df
         all_ints[f'{arr1_str}_{arr2_str}_Easting'] = int_pts['Easting']
@@ -152,71 +151,19 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
     return all_ints, all_rays
 
 
-#FIXME should move this function to another file or remove entirely
-def debug_ray_plot(path_station_gps, path_figures, array_list, 
-                   all_ints, all_rays, median_ints, data_heli):
-    for i, row in enumerate(all_rays.iterrows()):
-        fig, ax = plt.subplots(1, 1, tight_layout=True)
-        colors = cm.winter(np.linspace(0, 1, 5))
-        for j, arr_str in enumerate(array_list):
-            # get initial point, slope, and y-intercept of ray
-            p = utils.station_coords_avg(path_station_gps, arr_str)
-            a = row[1][arr_str]
-            m = 1 / np.tan(np.deg2rad(a))
-            b = p[0] - p[1]*m
-            # only plot positive end of the ray (arbitrary length 100)
-            if a > 180:
-                ax.plot([p[1], -1000], [p[0], -1000*m+b], 
-                        color=colors[j])
-            else: 
-                ax.plot([p[1],  1000], [p[0], 1000*m + b],
-                        color=colors[j])
-            # plot array centers as triangles
-            ax.scatter(p[1], p[0], c='k', marker='^')
-            ax.text(p[1], p[0]-0.0004, s=arr_str,
-                    va='center', ha='center')
-        #FIXME for testing purposes plot all intersections
-        for k in np.arange(0, 20, 2):
-            t = row[0]
-            ax.scatter(all_ints.loc[t][k+1], all_ints.loc[t][k],
-                    c='green', marker='o')
-
-        # plot median point
-        med_lat = median_ints.loc[t]['Lat']
-        med_lon = median_ints.loc[t]['Lon']
-        ax.plot(med_lon, med_lat, c='orange', marker='*', 
-                markersize=10, label='Median Intersection')
-
-        # plot helicopter "true" point
-        heli_lat = data_heli.loc[t]['Latitude']
-        heli_lon = data_heli.loc[t]['Longitude']
-        ax.plot(heli_lon, heli_lat, c='red', marker='*', 
-                markersize=10, label='True Heli Location')
-
-        ax.legend(loc='upper left')
-        ax.set_xlim([-116.85, -116.74])
-        ax.set_ylim([43.10, 43.18])
-
-        plt.suptitle(t)
-        #plt.show()
-        print(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"))
-        plt.savefig(os.path.join(path_figures, "backaz_errors", f"{t}_timestep.png"), dpi=500)
-        plt.close()
-    return
-
 
 if __name__ == "__main__":
     # choose times when helicopter is moving so we can compare points
-    # TIMES FOR 24-32 HZ
+    # TIMES FOR 07 OCT
     freqmin = 24.0
     freqmax = 32.0
-    t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
-    tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
-    ## TIMES FOR 2-8 HZ
+    #t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
+    #tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
+    # TIMES FOR 06 OCT
     #freqmin = 2.0
     #freqmax = 8.0
-    #t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
-    #tf = datetime.datetime(2023, 10, 6, 21, 0, 0, tzinfo=pytz.UTC)
+    t0 = datetime.datetime(2023, 10, 6, 18, 0, 0, tzinfo=pytz.UTC)
+    tf = datetime.datetime(2023, 10, 6, 23, 0, 0, tzinfo=pytz.UTC)
 
     main(settings.path_processed, settings.path_heli, 
          settings.path_station_gps, settings.path_output,
