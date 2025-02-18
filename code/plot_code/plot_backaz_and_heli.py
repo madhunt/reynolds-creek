@@ -83,7 +83,8 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
     # add y-label on middle subplot
     ax[2].set_ylabel('Backazimuth [$^o$]', fontsize=12)
     # format x-axis on bottom subplot
-    ax[4].set_xlabel("Local Time (US/Mountain) on 2023-10-06", fontsize=12)
+    datestr = lambda t: t.strftime("%Y-%m-%d")
+    ax[4].set_xlabel(f"Local Time (UTC-6:00) on {datestr(t0)}", fontsize=12)
 
     # set time axis limits
     #time_min = datetime.datetime(year=2023, month=10, day=6, hour=8, minute=0, tzinfo=pytz.timezone("US/Mountain"))
@@ -94,7 +95,7 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
     ax[4].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz=pytz.timezone("US/Mountain")))
 
     # FIGURE FORMATTING
-    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth\nFiltered {freqmin}-{freqmax} Hz, 2023-10-06", 
+    fig.suptitle(f"Known Helicopter Locations and Processed Backazimuth\nFiltered {freqmin}-{freqmax} Hz, {datestr(t0)}", 
                  fontsize=16)
     fig.tight_layout()
     # add colorbar across all subplots

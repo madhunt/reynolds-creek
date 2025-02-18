@@ -208,15 +208,15 @@ def debug_ray_plot(path_station_gps, path_figures, array_list,
 if __name__ == "__main__":
     # choose times when helicopter is moving so we can compare points
     # TIMES FOR 24-32 HZ
-    #freqmin = 24.0
-    #freqmax = 32.0
-    #t0 = datetime.datetime(2023, 10, 7, 17, 0, 0, tzinfo=pytz.UTC)
-    #tf = datetime.datetime(2023, 10, 7, 18, 30, 0, tzinfo=pytz.UTC)
-    # TIMES FOR 2-8 HZ
-    freqmin = 2.0
-    freqmax = 8.0
-    t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
-    tf = datetime.datetime(2023, 10, 6, 21, 0, 0, tzinfo=pytz.UTC)
+    freqmin = 24.0
+    freqmax = 32.0
+    t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
+    tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
+    ## TIMES FOR 2-8 HZ
+    #freqmin = 2.0
+    #freqmax = 8.0
+    #t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
+    #tf = datetime.datetime(2023, 10, 6, 21, 0, 0, tzinfo=pytz.UTC)
 
     main(settings.path_processed, settings.path_heli, 
          settings.path_station_gps, settings.path_output,
