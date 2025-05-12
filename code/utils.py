@@ -108,7 +108,8 @@ def arg_split_comma(arg):
         return arg
 
 
-def load_backaz_data(path_processed, array_str, freq_str, t0, tf):
+def load_beamform_results(path_processed, array_str, freq_str, t0, tf):
+    # formerly load_backaz_data
     # load processed infrasound data between given dates
     output = pd.DataFrame()
     for date_str in create_date_list(t0, tf):
