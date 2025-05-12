@@ -18,6 +18,7 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
     median_ints, all_ints, all_rays = crossbeam.main(path_processed, path_heli, path_station_gps,
                                                      None, 
                                                      t0, tf, freqmin, freqmax)
+    
 
 
     for i, row in enumerate(all_rays.iterrows()):
@@ -43,7 +44,7 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
         #FIXME for testing purposes plot all intersections
         for k in np.arange(0, 20, 2):
             t = row[0]
-            ax.scatter(all_ints.loc[t][k], all_ints.loc[t][k+1],
+            ax.scatter(all_ints.loc[t].iloc[k], all_ints.loc[t].iloc[k+1],
                     c='green', marker='o')
 
         # plot median point
@@ -59,8 +60,10 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
                 markersize=10, label='True Heli Location')
 
         ax.legend(loc='upper left')
-        ax.set_xlim([median_ints["Easting"].min(), median_ints["Easting"].max()])
-        ax.set_ylim([median_ints["Northing"].min(), median_ints["Northing"].max()])
+        #ax.set_xlim([median_ints["Easting"].min(), median_ints["Easting"].max()])
+        #ax.set_ylim([median_ints["Northing"].min(), median_ints["Northing"].max()])
+        ax.set_xlim([515500, 520500])
+        ax.set_ylim([4770000, 4780000])
 
         plt.suptitle(t)
         #plt.show()
@@ -76,13 +79,12 @@ if __name__ == "__main__":
     # TIMES FOR 07 OCT
     #freqmin = 24.0
     #freqmax = 32.0
-    #t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
-    #tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
-    # TIMES FOR 06 OCT
-    freqmin = 2.0
+    #t0 = datetime.datetime(2023, 10, 7, 19, 0, 0, tzinfo=pytz.UTC)
+    #tf = datetime.datetime(2023, 10, 7, 20, 0, 0, tzinfo=pytz.UTC)
+    freqmin = 4.0
     freqmax = 8.0
-    t0 = datetime.datetime(2023, 10, 6, 18, 0, 0, tzinfo=pytz.UTC)
-    tf = datetime.datetime(2023, 10, 6, 19, 0, 0, tzinfo=pytz.UTC)
+    t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
+    tf = datetime.datetime(2023, 10, 6, 21, 0, 0, tzinfo=pytz.UTC)
     main(settings.path_processed, settings.path_heli, 
          settings.path_station_gps, settings.path_figures,
          t0, tf, freqmin, freqmax)

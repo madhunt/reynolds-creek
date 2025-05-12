@@ -26,10 +26,12 @@ def main(path_output, path_station_gps, path_figures, array_str):
 
     # now plot data filtered to 15 min
     #FIXME HACK this should use index[0] and index[-1]
-    t0_list = [datetime.datetime(2023, 10, 7, 16, 0)+n*datetime.timedelta(minutes=15) 
-               for n in range((21-16)*4)]
+    #t0_list = [datetime.datetime(2023, 10, 7, 16, 0)+n*datetime.timedelta(minutes=15) 
+    #           for n in range((21-16)*4)]
     #t0_list = [datetime.datetime(2023, 10, 6, 18, 0)+n*datetime.timedelta(minutes=15) 
     #           for n in range((23-18)*4)]
+    t0_list = [datetime.datetime(2023, 10, 6, 20, 0)+n*datetime.timedelta(minutes=15) 
+               for n in range(10)]
     for t0 in t0_list:
         # initialize figure
         fig, ax = plt.subplots(nrows=3, ncols=1, height_ratios=[1, 1, 3], 
@@ -89,11 +91,19 @@ def main(path_output, path_station_gps, path_figures, array_str):
         # set axis limits
         ax[2].set_xlim([median_ints["True Easting"].min(), median_ints["True Easting"].max()])
         ax[2].set_ylim([median_ints["True Northing"].min(), median_ints["True Northing"].max()])
+
+        #TODO set axis limits for x-axis now that there are nans
+        # expect northing values to be better because TOP has really good resolution from N to S
+        # and worse easting values
+
+        #TODO add horiz lines showing extent of proposed burn area east-west and north-south 
+
+
         
         # and box around upper plots
-        ax[0].vlines(x=[t0, tf], ymin=median_ints["Easting"].min(), ymax=median_ints["Easting"].max(),
+        ax[0].vlines(x=[t0, tf], ymin=-10*median_ints["Easting"].min(), ymax=10*median_ints["Easting"].max(),
                      linestyle="--", colors="black")
-        ax[1].vlines(x=[t0, tf], ymin=median_ints["Northing"].min(), ymax=median_ints["Northing"].max(), 
+        ax[1].vlines(x=[t0, tf], ymin=-10*median_ints["Northing"].min(), ymax=10*median_ints["Northing"].max(), 
                      linestyle="--", colors="black")
 
 
@@ -113,8 +123,9 @@ def main(path_output, path_station_gps, path_figures, array_str):
 
 if __name__ == "__main__":
     main(os.path.join(settings.path_output,
-                      #"median_intersections_2.0-8.0Hz_20231006-18-00_20231006-23-00.csv"),
-                      "median_intersections_2.0-8.0Hz_20231007-16-00_20231007-21-00.csv"),
+                      "median_intersections_4.0-8.0Hz_20231006-20-00_20231006-22-30.csv"),
+                      #"median_intersections_4.0-8.0Hz_20231006-21-30_20231006-22-30.csv"),
+                      #"median_intersections_2.0-8.0Hz_20231007-16-00_20231007-21-00.csv"),
                       #"median_intersections_24.0-32.0Hz_20231007-16-00_20231007-21-00.csv"),
                       #"median_intersections_24.0-32.0Hz_20231006-18-00_20231006-23-00.csv"),
          settings.path_station_gps,

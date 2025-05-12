@@ -48,6 +48,9 @@ def main(path_processed, path_heli, path_station_gps, path_output,
     # calculate distance between median int and heli point (in m)
     median_ints['Distance'] = np.sqrt((median_ints['True Easting'] - median_ints['Easting'])**2 +
                                       (median_ints['True Northing'] - median_ints['Northing'])**2)
+    
+    # add column for plotting points through time in QGIS
+    median_ints['Time Int'] = median_ints.index.astype(int)
 
     # save median_ints dataframe (to make figures in another file)
     if path_output != None:
@@ -121,6 +124,14 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
         p1 = utils.station_coords_avg(path_station_gps, arr1_str, latlon=False)
         p2 = utils.station_coords_avg(path_station_gps, arr2_str, latlon=False)
 
+        # filter by slowness (only keep backaz between reasonable slowness values)
+        
+        
+        #NOTE SLOWNESS FILTER HERE
+        slow_filt =  lambda arr: arr[arr['Slowness'].between(2.0, 3.5)]
+        arr1 = slow_filt(arr1)
+        arr2 = slow_filt(arr2)
+
         # save rays (for plotting)
         all_rays[arr1_str] = arr1['Backaz']
         all_rays[arr2_str] = arr2['Backaz']
@@ -154,16 +165,21 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
 
 if __name__ == "__main__":
     # choose times when helicopter is moving so we can compare points
+    freqmin = 4.0
+    freqmax = 8.0
+    #freqmin = 24.0
+    #freqmax = 32.0
+
     # TIMES FOR 07 OCT
-    freqmin = 24.0
-    freqmax = 32.0
     #t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
     #tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
     # TIMES FOR 06 OCT
-    #freqmin = 2.0
-    #freqmax = 8.0
-    t0 = datetime.datetime(2023, 10, 6, 18, 0, 0, tzinfo=pytz.UTC)
-    tf = datetime.datetime(2023, 10, 6, 23, 0, 0, tzinfo=pytz.UTC)
+    #t0 = datetime.datetime(2023, 10, 6, 18, 0, 0, tzinfo=pytz.UTC)
+    #tf = datetime.datetime(2023, 10, 6, 23, 0, 0, tzinfo=pytz.UTC)
+    # times determined from best signal
+    t0 = datetime.datetime(2023, 10, 6, 20, 0, 0, tzinfo=pytz.UTC)
+    tf = datetime.datetime(2023, 10, 6, 22, 30, 0, tzinfo=pytz.UTC)
+
 
     main(settings.path_processed, settings.path_heli, 
          settings.path_station_gps, settings.path_output,

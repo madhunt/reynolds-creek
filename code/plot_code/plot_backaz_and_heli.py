@@ -39,7 +39,15 @@ def main(path_processed, path_heli, path_station_gps, path_figures,
         # sort by ascending semblance so brightest points are plotted on top
         output = output.sort_values(by="Semblance", ascending=True)
         # constrain data to only plot points with slownesses near 3 s/km
-        output = output[output["Slowness"].between(2.5, 3.5)]
+        
+
+        #NOTE SLOWNESS FILTER HERE
+        output = output[output["Slowness"].between(2, 3.5)]
+
+
+
+
+
 
         # PLOT BACKAZIMUTHS
         # create truncated greyscale colormap
@@ -121,11 +129,20 @@ if __name__ == "__main__":
     #tf = datetime.datetime(2023, 10, 7, 2, 0, 0, tzinfo=pytz.UTC)
 
     # settings for AGU figure 24-23 Hz -----------------------------
+    #freqmin = 24.0
+    #freqmax = 32.0
+    ## these UTC times give Mountain 10:00-15:00
+    #t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
+    #tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
+
+
+
     freqmin = 24.0
     freqmax = 32.0
-    # these UTC times give Mountain 10:00-15:00
     t0 = datetime.datetime(2023, 10, 7, 16, 0, 0, tzinfo=pytz.UTC)
     tf = datetime.datetime(2023, 10, 7, 21, 0, 0, tzinfo=pytz.UTC)
+
+
     
     main(settings.path_processed, 
          settings.path_heli, 
