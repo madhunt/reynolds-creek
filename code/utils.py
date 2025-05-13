@@ -126,6 +126,16 @@ def load_beamform_results(path_processed, array_str, freq_str, t0, tf):
     output = filt(output).set_index('Time')
     return output
 
+def slowness_to_sx_sy(path_processed, array_str, freq_str, t0, tf):
+    # load in data
+    output = load_beamform_results(path_processed, array_str, freq_str, t0, tf)
+
+    # convert slowness vector and backaz into (sx, sy)
+    output["sx"] = output["Slowness"] * np.sin(np.deg2rad(output["Backaz"]))
+    output["sy"] = output["Slowness"] * np.cos(np.deg2rad(output["Backaz"]))
+    return output
+
+
 def create_date_list(t0, tf):
     def date_to_str(datetime_obj):
         return datetime_obj.strftime(format="%Y-%m-%-d")
