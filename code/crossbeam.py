@@ -118,8 +118,8 @@ def calc_array_intersections(path_processed, path_station_gps, array_list, t0, t
     for i, (arr1_str, arr2_str) in enumerate(itertools.combinations(array_list, 2)):
         # load in processed data
         freq_str = f"{freqmin}_{freqmax}"
-        arr1 = utils.load_backaz_data(path_processed, arr1_str, freq_str, t0, tf)
-        arr2 = utils.load_backaz_data(path_processed, arr2_str, freq_str, t0, tf)
+        arr1 = utils.load_beamform_results(path_processed, arr1_str, freq_str, t0, tf)
+        arr2 = utils.load_beamform_results(path_processed, arr2_str, freq_str, t0, tf)
         # calculate center point of arrays (lat, lon)
         p1 = utils.station_coords_avg(path_station_gps, arr1_str, latlon=False)
         p2 = utils.station_coords_avg(path_station_gps, arr2_str, latlon=False)

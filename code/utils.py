@@ -11,10 +11,8 @@ from obspy.core.util import AttribDict
 from obspy.geodetics.base import gps2dist_azimuth
 import matplotlib.colors as colors
 
-def load_data(path_data, path_coords, array_str=None,
-              gem_include=None, gem_exclude=None,
-              time_start=None, time_stop=None,
-              freqmin=None, freqmax=None):
+def load_data(path_data, path_coords, array_str=None, gem_include=None, gem_exclude=None,
+              time_start=None, time_stop=None, freqmin=None, freqmax=None):
     '''
     Loads in and pre-processes array data.
         Loads all miniseed files in a specified directory into an obspy stream. 
@@ -70,10 +68,12 @@ def load_data(path_data, path_coords, array_str=None,
     
     # (4) add coordinates to traces
     # import coordinates
-    #coords = pd.DataFrame()
-    #for file in path_coords:
-    #    coords = pd.concat([coords, pd.read_csv(file)])
-    coords = pd.read_csv(path_coords)
+    #FIXME this is a hack so i can feed a pd df into this function instead of a path
+    if type(path_coords) == str:
+        path_coords = glob.glob(os.path.join(path_coords, "*.csv" ))
+        coords = pd.read_csv(path_coords)
+    else:
+        coords = path_coords
     coords["Name"] = coords["Name"].astype(str) # SN of gem
     
     # get rid of any stations that don't have coordinates

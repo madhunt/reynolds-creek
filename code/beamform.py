@@ -9,7 +9,7 @@ from obspy.signal.array_analysis import array_processing
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib.dates import num2date
 
-import utils, plot_utils
+import utils
 
 def main(path_home, process=False, 
          array_str=None,
@@ -66,7 +66,7 @@ def main(path_home, process=False,
     return
 
 
-def process_data(data, path_processed, time_start=None, time_stop=None, freqmin=None, freqmax=None):
+def process_data(data, path_processed=None, time_start=None, time_stop=None, freqmin=None, freqmax=None):
     '''
     Run obspy array_processing() function to beamform data. Save in .npy format to specified 
     location. Returns output as np array, with backazimuths from 0-360.
@@ -114,9 +114,12 @@ def process_data(data, path_processed, time_start=None, time_stop=None, freqmin=
     
     # save time steps as datetime types
     output["Time"] = num2date(output["Time"])
+    # set index to time
+    output = output.set_index("Time")
 
     # save output to pickle
-    output.to_pickle(path_processed)
+    if path_processed != None:
+        output.to_pickle(path_processed)
     return output
 
 if __name__ == "__main__":
