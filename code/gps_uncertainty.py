@@ -110,9 +110,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # arguments that are the same for every run (specific to Borah)
-    path_mseed = os.path.join("bsuhome", "madelinehunt", "reynolds-creek", "data", "mseed")
-    path_station_gps = os.path.join("bsuhome", "madelinehunt", "reynolds-creek", "data", "gps")
-    path_save = os.path.join("bsuhome", "madelinehunt", "reynolds-creek", "data", "processed", "uncert_results")
+    path_mseed = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "mseed")
+    path_station_gps = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "gps")
+    path_save = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "processed", "uncert_results")
     
     time_start = UTCDateTime(2023, 10, 5, 0, 0, 0)
     time_stop = UTCDateTime(2023, 10, 8, 0, 0, 0)

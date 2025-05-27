@@ -23,6 +23,6 @@ echo "Num Tasks Allocated   = $SLURM_NTASKS"
 mamba activate array
 #python -u beamform.py -p -a $1 -f 24 32 -t1 $2
 #python -u beamform.py -p -a $1 -F 0.5 40 -t1 $2
-python -u gps_uncertainty.py -a TOP -g 0.5
+python -u gps_uncertainty.py -a JDSB -g 0.5
 
 echo "Time Completed        = $(date)"
