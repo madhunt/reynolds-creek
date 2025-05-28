@@ -18,8 +18,8 @@ def main(path_mseed, path_station_gps, path_save,
          freqmin, freqmax,
          gps_perturb_scale, n_iters=1000):
 
-    # LOG processing start time
-    with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
+    # LOG processing start time and create logfile ("w")
+    with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "w") as f:
         print(f"{datetime.datetime.now()} \t\t Started Processing", file=f)
 
     # loop through each iteration 
@@ -42,9 +42,9 @@ def main(path_mseed, path_station_gps, path_save,
                 time_start=time_start, time_stop=time_stop,
                 freqmin=freqmin, freqmax=freqmax)
 
-        # LOG make sure data exists
-        with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
-            print(data, file=f)
+        ## LOG make sure data exists and append to existing file ("a")
+        #with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
+        #    print(data, file=f)
 
         # (3) perform beamforming
         output = beamform.process_data(data, path_processed=None, 
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     time_start = UTCDateTime(2023, 10, 5, 0, 0, 0)
     time_stop = UTCDateTime(2023, 10, 8, 0, 0, 0)
 
-    freq_list = [(0.0, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
+    freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
 
     with ProcessPoolExecutor(max_workers=48) as pool:
         args_list = [[path_mseed, path_station_gps, path_save,
@@ -140,7 +140,7 @@ if __name__ == "__main__":
                      for freqmin,freqmax in freq_list]
         result = pool.map(main, *zip(*args_list))
 
-    with open(os.path.join(path_save, "pylog.txt"), "a") as f:
+    with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
         print(f"{datetime.datetime.now()} \t\t Completed Processing", file=f)
 
     
