@@ -18,6 +18,10 @@ def main(path_mseed, path_station_gps, path_save,
          freqmin, freqmax,
          gps_perturb_scale, n_iters=1000):
 
+    # LOG processing start time
+    with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
+        print(f"{datetime.datetime.now()} \t\t Started Processing", file=f)
+
     # loop through each iteration 
     for i in range(n_iters):
         # (1) perturb coordinates
@@ -38,6 +42,10 @@ def main(path_mseed, path_station_gps, path_save,
                 time_start=time_start, time_stop=time_stop,
                 freqmin=freqmin, freqmax=freqmax)
 
+        # LOG make sure data exists
+        with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
+            print(data, file=f)
+
         # (3) perform beamforming
         output = beamform.process_data(data, path_processed=None, 
                                        time_start=time_start, time_stop=time_stop,
@@ -47,10 +55,10 @@ def main(path_mseed, path_station_gps, path_save,
         if i == 0:
             # set initial values for first iteration (mean=0, M2=0)
             agg_col_names = ["Semblance Mean", "Abs Power Mean", "Backaz Mean", "Slowness Mean",
-                             "Semblance M2", "Abs Power M2", "Backaz M2", "Slowness M2"]
+                             "Semblance M2", "Abs Power M2", "Backaz M2", "Slowness M2", "N"]
             data_init = np.zeros(shape=(len(output), len(agg_col_names)))
             output_aggregate = pd.DataFrame(data_init, columns=agg_col_names, index=output.index)
-
+        
         for col in output.columns:
             n = i+1     # num of datapoints is 1 greater than iteration number
             val = output[col]
@@ -64,8 +72,13 @@ def main(path_mseed, path_station_gps, path_save,
             # update to save new mean and M2
             output_aggregate[col+" Mean"] = mean_new
             output_aggregate[col+" M2"] = M2_new
-            print(output_aggregate)
+        # save number of data points
+        output_aggregate["N"] = n
         
+        # log iteration number
+        with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
+            print(f"\t\t Iter: {i}, Num: {n}", file=f)
+
         # save updated mean/M2 in file (will be overwritten each loop)
         output_aggregate.to_pickle(os.path.join(path_save, 
                                                 f"output_aggregate_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.pkl"))
