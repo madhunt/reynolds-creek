@@ -16,5 +16,5 @@ path_output = os.path.join(path_home, "data", "output")
 path_figures = os.path.join(path_home, "figures")
 
 
-path_processed_uncert = os.path.join(path_harddrive, "geoph522")
+#path_processed_uncert = os.path.join(path_harddrive, "geoph522")
 

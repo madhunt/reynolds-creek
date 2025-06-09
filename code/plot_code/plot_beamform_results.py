@@ -48,7 +48,7 @@ def beamform_results_vs_time(path_processed, path_figures, t0, tf):
             N = array_dict[array_str]
             output["Adj Semblance"] = N/(N-1) * (output["Semblance"] - 1/N)
 
-            # plot each veriable in outpur results
+            # plot each veriable in output results
             for i, var_str in enumerate(var_dict):
                 
                 # configure y-axis

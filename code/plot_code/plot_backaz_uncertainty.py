@@ -15,7 +15,7 @@ import matplotlib.dates as mdates
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils, settings
 
-def main(path_processed_uncert, path_heli, path_station_gps, path_figures,
+def main(path_processed, path_heli, path_station_gps, path_figures,
          freqmin, freqmax, gps_perturb_scale):
 
     ## define arrays and plot subtitles
@@ -33,22 +33,94 @@ def main(path_processed_uncert, path_heli, path_station_gps, path_figures,
     #    # LOAD PROCESSED BACKAZIMUTH DATA
     #    path_files = glob.glob(os.path.join(path_processed_uncert, f"output_{array_str}_gps_{gps_perturb_scale}*"))
     #    output_all = np.empty(shape=[179, 5, len(path_files)])
-    output_aggregate = pd.read_pickle(os.path.join(settings.path_output, "output_aggregate_JDNB_4.0-8.0Hz_0.5m.pkl"))
+    
+    array_str = "TOP"
+    # frequency bands
+    freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
+    # variables (yaxis bounds, tickmarks, and subtitles)
+    var_dict = {'Slowness':[(-0.1,6), (0,2,4,6), "Slowness\n(s/km)"], 
+                  'Semblance':[(-0.2,1.2), (0,0.5,1), "Semblance"], 
+                  'Backaz':[(-10,370), (0,90,180,270,360), "Backaz\n($^o$)"],
+                  'Abs Power':[(1e8,8e13), (1e8,1e10,1e12), "Absolute\nPower"]}
+
+    for freq_tup in freq_list:
+        print(f"{freq_tup}")
+
+        fig, ax = plt.subplots(nrows=4, ncols=2, width_ratios=[4,1], figsize=[12,6])
+        freq_str = f"{freq_tup[0]}-{freq_tup[1]}"
+
+        output_agg = pd.read_pickle(os.path.join(path_processed, f"output_aggregate_{array_str}_{freq_str}Hz_0.5m.pkl"))
+
+        # calculate adjusted semblance
+        #N_sens = 3
+        #output_agg["Adj Semblance Mean"] = N_sens/(N_sens-1) * (output_agg["Semblance Mean"] - 1/N_sens)
+
+
+        # plot each variable in output results
+        for i, var_str in enumerate(var_dict):
+            # configure y-axis
+            if var_str == "Abs Power":
+                ax[i,0].set_yscale("log")
+            else:
+                ax[i,0].set_yticks(ticks=var_dict[var_str][1], labels=[str(i) for i in var_dict[var_str][1]])
+            ax[i,0].set_ylim(var_dict[var_str][0])
+            ax[i,0].set_ylabel(var_dict[var_str][2], fontsize=16)
+            # set tick label size
+            ax[i,0].tick_params(axis='both', which='major', labelsize=16)
+            ax[i,1].tick_params(axis='both', which='major', labelsize=16)
+
+            #FIXME backaz is prob not from 0 to 360!!!!!
+            variance = (1/output_agg["N"]) * output_agg[f"{var_str} M2"]
+            if var_str == "Backaz":
+                variance = variance % 360
+                #FIXME i dont think this is correct at all 
+            # plot mean values for all iterations
+            ax[i,0].errorbar(output_agg.index, output_agg[f"{var_str} Mean"], 
+                             yerr=variance, color="k", marker=".", linestyle='none', ecolor="red")
+            ## calculate variance
+            #ax[i,0].plot(output_agg.index, output_agg[f"{var_str} Mean"]+var, 'r.')
+            #ax[i,0].plot(output_agg.index, output_agg[f"{var_str} Mean"]-var, 'b.')
+            ## plot points within slowness bounds as red
+            #test_slow = lambda arr: arr[arr['Slowness'].between(2.0, 3.5)]
+            #output_test_slow = test_slow(output)
+            #ax[i,0].plot(output_test_slow.index, output_test_slow[var_str], 'r.')
+
+            # plot boxplot with distribution for each variable
+            ax[i,1].boxplot(variance, vert=False, widths=0.7)
+            ax[i,1].set_yticks([],[])
+            
+
+            # make all plots share x-axis
+            if i > 0:
+                ax[i,0].sharex(ax[i-1,0])
+                #ax[i,1].sharex(ax[i-1,1])
+            # hide x-label for all but last subplot
+            if i < len(ax)-1:
+                ax[i,0].set_xticklabels([])
+                ax[i,0].xaxis.set_visible(False)
+                #ax[i,1].set_xticklabels([])
+                #ax[i,1].xaxis.set_visible(False)
+    
+        # set and format x-axis
+        t0 = datetime.datetime(2023, 10, 6, 18, 0, 0, tzinfo=pytz.UTC)
+        tf = datetime.datetime(2023, 10, 6, 23, 0, 0, tzinfo=pytz.UTC)
+        ax[len(ax)-1,0].set_xlim([t0, tf])
+        ax[len(ax)-1,0].xaxis.set_major_locator(mdates.HourLocator(byhour=range(24), interval=1, tz=pytz.timezone("US/Mountain")))
+        ax[len(ax)-1,0].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz=pytz.timezone("US/Mountain")))
+        ax[len(ax)-1,1].set_xticks([0,100,200],[0,100,200])
+
+        # add subtitle
+        #fig.suptitle(f"{array_str}, {freq_str}", fontsize=20)
+        fig.suptitle(f"{array_str}, {freq_str}", fontsize=20)
+        fig.tight_layout()
+        fig.align_ylabels()
+        # squish plots together
+        plt.subplots_adjust(wspace=0.1, hspace=0)
+        plt.savefig(os.path.join(path_figures, "uncert_results", f"{array_str}_{freq_str}.png"))
+        plt.close()
 
     #NOTE to self: you need to make sure to filter points by slowness and only use the 
     # good ones like you have in other figure code!!
-
-    # calculate mean
-    print(output_aggregate)
-    output_sub = output_aggregate[4200:4300]
-
-    fig, ax = plt.subplots(1, 1)
-    var = (1/10)*output_sub["Backaz M2"]
-    ax.plot(output_sub.index, output_sub["Backaz Mean"]+var, 'r-')
-    ax.plot(output_sub.index, output_sub["Backaz Mean"]-var, 'b-')
-    ax.plot(output_sub.index, output_sub["Backaz Mean"], 'ko')
-
-    plt.show()
 
 
     #    for j, file in enumerate(path_files):
@@ -158,11 +230,11 @@ def main(path_processed_uncert, path_heli, path_station_gps, path_figures,
 
 if __name__ =="__main__":
     # settings
-    freqmin = 24.0
-    freqmax = 32.0
+    freqmin = 4.0
+    freqmax = 8.0
     gps_perturb_scale = 3 # m
 
-    main(settings.path_processed_uncert, 
+    main(os.path.join(settings.path_processed, "uncert_results"), 
          settings.path_heli,
          settings.path_station_gps,
          settings.path_figures,
