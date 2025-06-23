@@ -117,6 +117,7 @@ if __name__ =="__main__":
     freqmax = 8.0
     gps_perturb_scale = 0.5 # m
 
+    settings.set_paths(location='laptop')
     main(os.path.join(settings.path_processed, "uncert_results"), 
          settings.path_figures,
          array_str, freqmin, freqmax, gps_perturb_scale)
