@@ -125,27 +125,23 @@ if __name__ == "__main__":
                         dest="gps_perturb_scale",
                         type=float,
                         help="GPS perturbation scale in meters ('-g 0.2' for 0.2 m perturbations)")
-
     args = parser.parse_args()
 
-    # arguments that are the same for every run (specific to Borah)
-    path_mseed = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "mseed")
-    path_station_gps = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "gps")
-    path_save = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek", "data", "processed", "uncert_results")
-    
     time_start = UTCDateTime(2023, 10, 5, 0, 0, 0)
     time_stop = UTCDateTime(2023, 10, 8, 0, 0, 0)
 
     freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
     n_iters = 1000
+    settings.set_paths(location='borah')
 
     with ProcessPoolExecutor(max_workers=48) as pool:
         # run each iteration within each freq band in parallel
-        args_list = [[path_mseed, path_station_gps, path_save,
-                     args.array_str, time_start, time_stop, 
-                     freqmin, freqmax,
-                     args.gps_perturb_scale, i]
-                     for freqmin,freqmax in freq_list for i in range(n_iters)]
+        args_list = [[settings.path_mseed, settings.path_station_gps, 
+                      os.path.join(settings.path_processed, "uncert_results"), 
+                      args.array_str, time_start, time_stop, 
+                      freqmin, freqmax, 
+                      args.gps_perturb_scale, i] 
+                      for freqmin,freqmax in freq_list for i in range(n_iters)] 
         result = pool.map(main, *zip(*args_list))
 
     #with open(os.path.join(path_save, f"pylog_{args.array_str}_{freqmin}-{freqmin}Hz_{args.gps_perturb_scale}m.txt"), "a") as f:

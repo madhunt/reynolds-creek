@@ -104,7 +104,7 @@ def load_beamform_data_all_iters(n_iters, n_outputs, path_processed, filename_fu
             data_combined[n,3,:] = output["Slowness"].values
             
     # save combined data
-    file_save = re.sub(r"_iter\d", "", filename_func(0))
+    file_save = re.sub(r"_iter\d.pkl", "_combined", filename_func(0))
     np.save(os.path.join(path_processed, file_save),
             arr=data_combined, allow_pickle=True)
 
@@ -113,10 +113,11 @@ def load_beamform_data_all_iters(n_iters, n_outputs, path_processed, filename_fu
 if __name__ =="__main__":
     # settings
     gps_perturb_scale = 0.5 # m
-    array_list = ["TOP", "JDNA", "JDNB", "JDSA", "JDSB"]
+    #array_list = ["TOP", "JDNA", "JDNB", "JDSA", "JDSB"]
+    array_list = ["JDNB"]
     freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
 
-    settings.set_paths(location='borah')
+    settings.set_paths(location='laptop')
     
     for array_str in array_list:
         for freqmin, freqmax in freq_list:
