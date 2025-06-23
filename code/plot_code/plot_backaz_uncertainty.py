@@ -112,12 +112,14 @@ def load_beamform_data_all_iters(n_iters, n_outputs, path_processed, filename_fu
 
 if __name__ =="__main__":
     # settings
-    array_str = "JDNB"
-    freqmin = 4.0
-    freqmax = 8.0
     gps_perturb_scale = 0.5 # m
+    array_list = ["TOP", "JDNA", "JDNB", "JDSA", "JDSB"]
+    freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
 
-    settings.set_paths(location='laptop')
-    main(os.path.join(settings.path_processed, "uncert_results"), 
-         settings.path_figures,
-         array_str, freqmin, freqmax, gps_perturb_scale)
+    settings.set_paths(location='borah')
+    
+    for array_str in array_list:
+        for freqmin, freqmax in freq_list:
+            main(os.path.join(settings.path_processed, "uncert_results", array_str), 
+                settings.path_figures,
+                array_str, freqmin, freqmax, gps_perturb_scale)

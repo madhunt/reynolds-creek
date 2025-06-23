@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-Define paths to use in all files when run from this computer.
+Define paths to use in all files when run from laptop, harddrive, or borah.
 '''
 import os
 
@@ -15,12 +15,12 @@ path_figures = None
 def set_paths(location):
     global path_home, path_processed, path_mseed, path_heli, path_station_gps, path_output, path_figures
 
-    if location == 'harddrive':
-        path_home = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
-    elif location == 'laptop':
+    if location == 'laptop':
         path_home = os.path.join("/", "home", "mad", "Documents", "research", "reynolds-creek")
     elif location == 'borah':
         path_home = os.path.join("/", "bsuhome", "madelinehunt", "reynolds-creek")
+    elif location == 'harddrive':
+        path_home = os.path.join("/", "media", "mad", "LaCie 2 LT", "research", "reynolds-creek")
     else:
         raise ValueError(f"Unknown location: {location}")
 
