@@ -87,6 +87,9 @@ def main(path_station_gps, path_dem, path_figures):
     sp = 25
     xgdec = xg[25::sp, 25::sp]
     ygdec = yg[25::sp, 25::sp]
+    #sp = 10
+    #xgdec = xg[10::sp, 10::sp]
+    #ygdec = yg[10::sp, 10::sp]
     colors_net = plt.get_cmap('rainbow')(np.linspace(0,1,np.size(xgdec)))
     ax_net.plot(xgdec, ygdec, "ko", markerfacecolor=[1,0.5,0.5])   # jeff default color
     #ax_net.scatter(xgdec, ygdec, c=colors_net)
@@ -136,15 +139,9 @@ def main(path_station_gps, path_dem, path_figures):
                 restmpnn = np.abs(dtmpnn - (dists_top[:,:,n] - dists_top[:,:,n+1]))
             restmp_top += restmpnn**2
         
-
-        #drestmp = np.sqrt(restmp_jdna/16 + restmp_jdnb/16 +
-        #                  restmp_jdsa/16 + restmp_jdsb/16 + 
-        #                  restmp_top/44**2)
         drestmp = np.sqrt(restmp_jdna + restmp_jdnb +
                           restmp_jdsa + restmp_jdsb + 
                           restmp_top)
-        #drestmp = np.sqrt(restmp_jdna + restmp_jdnb + 
-        #                  restmp_jdsa + restmp_jdsb)
         trestmp = drestmp / 343
 
 
@@ -154,15 +151,16 @@ def main(path_station_gps, path_dem, path_figures):
                                  #levels=np.linspace(trestmp.min(), trestmp.max(), 3),
                                  #NOTE change these (default is jeff's)
                                  levels=np.arange(0.005, 0.015, 0.00125),
-                                 #levels=np.arange(0.001, 0.004, 0.001),
-                                 #levels=np.arange(0.007, 0.011, 0.001),
                                  #levels=np.linspace(np.nanmin(trestmp), np.nanmin(trestmp)+0.05, 3),
                                  colors=[(1, 0.5, 0.5)])
                                  #colors=[colors_net[k]])
                                  #cmap='viridis')
-    #cbar_net = fig_net.colorbar(contour)
+        ax_net.contour(easting, northing, trestmp,
+                                 levels=np.linspace(0.01, 0.11, 1),
+                                 colors=['blue'])
+    cbar_net = fig_net.colorbar(contour)
 
-    fig_arr = plot_array_response(path_figures, path_station_gps)
+    #fig_arr = plot_array_response(path_figures, path_station_gps)
 
     plt.show()
 
