@@ -70,7 +70,7 @@ def load_data(path_data, path_coords, array_str=None, gem_include=None, gem_excl
     # import coordinates
     #FIXME this is a hack so i can feed a pd df into this function instead of a path
     if type(path_coords) == str:
-        path_coords = glob.glob(os.path.join(path_coords, "*.csv" ))
+        path_coords = glob.glob(os.path.join(path_coords, "*.csv" ))[0]
         coords = pd.read_csv(path_coords)
     else:
         coords = path_coords
