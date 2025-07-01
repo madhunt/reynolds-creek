@@ -9,9 +9,10 @@ import glob, os, argparse, datetime
 from obspy.core.utcdatetime import UTCDateTime
 from concurrent.futures import ProcessPoolExecutor
 
+from obspy.core.util import AttribDict
 import utils, settings, beamform
 
-def main(path_mseed, path_station_gps, path_save,
+def main(data, path_station_gps, path_save,
          array_str, time_start, time_stop,
          freqmin, freqmax,
          gps_perturb_scale, iteration):
@@ -43,18 +44,20 @@ def main(path_mseed, path_station_gps, path_save,
     coords["Latitude"] = coords["Latitude"] + lat_perturb
     coords["Longitude"] = coords["Longitude"] + lon_perturb
 
-    # (2) load in raw data with perturbed coordinates -------------------------------------------------------------------
-    print(iteration, "loading data")
-    data = utils.load_data(path_mseed, path_coords=coords, array_str=array_str,
-            gem_include=None, gem_exclude=["TOP32", "TOP07"],
-            time_start=time_start, time_stop=time_stop,
-            freqmin=freqmin, freqmax=freqmax)
+    # update coords in data
+    # (2) perturb coords in data
+    for _, row in coords.iterrows():
+        sn = row["Station"]
+        for trace in data.select(station=sn):
+            trace.stats.coordinates = AttribDict({
+                'latitude': row["Latitude"],
+                'longitude': row["Longitude"],
+                'elevation': row["Elevation"] }) 
 
     # (3) perform beamforming -----------------------------------
 
     # test if any sensors stopped recording before specified time_stop
     station_stop = np.array([data.traces[i].stats["endtime"] == time_stop for i in range(len(data.traces))])
-    print(station_stop)
 
     if np.all(station_stop):    # all sensors recorded entire duration
         print(iteration, "all recorded entire time")
@@ -121,54 +124,49 @@ if __name__ == "__main__":
                         type=str,
                         default=None,
                         help="Array String ('-a TOP' for TOP array)")
-    parser.add_argument("-g", "--gps-scale",
-                        dest="gps_perturb_scale",
-                        type=float,
-                        help="GPS perturbation scale in meters ('-g 0.2' for 0.2 m perturbations)")
+    parser.add_argument("-f", "--freq", 
+                        nargs=2, 
+                        dest="freq", 
+                        metavar=("freqmin", "freqmax"), 
+                        type=float, 
+                        help="Min and max corner frequencies for bandpass filter.")
+    parser.add_argument("-p", "--paths",
+                        dest="paths",
+                        type=str,
+                        default='borah',
+                        help="laptop or borah")
     args = parser.parse_args()
 
     time_start = UTCDateTime(2023, 10, 5, 0, 0, 0)
     time_stop = UTCDateTime(2023, 10, 8, 0, 0, 0)
-
-    #freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
     n_iters = 100
-    settings.set_paths(location='borah')
+    settings.set_paths(location=args.paths)
 
-    freqmin = 24.0
-    freqmax = 32.0
+    data = utils.load_data(settings.path_mseed, 
+                           path_coords=settings.path_station_gps, 
+                           array_str="TOP", 
+                           gem_include=None, 
+                           gem_exclude=["TOP32", "TOP07"], 
+                           time_start=time_start, time_stop=time_stop, 
+                           freqmin=args.freq[0], freqmax=args.freq[1])
 
-    with ProcessPoolExecutor(max_workers=4) as pool:
+    with ProcessPoolExecutor(max_workers=24) as pool:
         # run each iteration within each freq band in parallel
-        args_list = [[settings.path_mseed, settings.path_station_gps, 
+        args_list = [[data, 
+                      settings.path_station_gps, 
                       os.path.join(settings.path_processed, "uncert_results"), 
-                      args.array_str, time_start, time_stop, 
-                      freqmin, freqmax, 
-                      args.gps_perturb_scale, i] 
+                      args.array_str, 
+                      time_start, time_stop, 
+                      args.freq[0], args.freq[1], 
+                      0.5, i] 
                       for i in range(n_iters)] 
         result = pool.map(main, *zip(*args_list))
     #try running without parallel????
     #for i in range(n_iters):
-    #    main(settings.path_mseed, settings.path_station_gps, 
+    #    main(data, settings.path_station_gps, 
     #          os.path.join(settings.path_processed, "uncert_results"), 
     #          args.array_str, time_start, time_stop, 
-    #          freqmin, freqmax, 
-    #          args.gps_perturb_scale, i)
+    #          args.freq[0], args.freq[1], 
+    #          0.5, i)
 
-    #with ProcessPoolExecutor(max_workers=12) as pool:
-    #    # run each iteration within each freq band in parallel
-    #    args_list = [[settings.path_mseed, settings.path_station_gps, 
-    #                  os.path.join(settings.path_processed, "uncert_results"), 
-    #                  args.array_str, time_start, time_stop, 
-    #                  freqmin, freqmax, 
-    #                  args.gps_perturb_scale, i] 
-    #                  for freqmin,freqmax in freq_list for i in range(n_iters)] 
-    #    result = pool.map(main, *zip(*args_list))
-
-    #freqmin = 0.5
-    #freqmax = 2.0
-    #i = 0  
-    #print("Entering main")
-    #main(settings.path_mseed, settings.path_station_gps,
-    #     os.path.join(settings.path_processed, "uncert_results"),
-    #     "TOP", time_start, time_stop, freqmin, freqmax, 0.5, i)
     
