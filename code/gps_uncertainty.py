@@ -14,21 +14,24 @@ import utils, settings, beamform
 def main(path_mseed, path_station_gps, path_save,
          array_str, time_start, time_stop,
          freqmin, freqmax,
-         gps_perturb_scale, iter):
+         gps_perturb_scale, iteration):
 
     # LOG: record processing start time
-    if iter == 0:
+    if iteration == 0:
         # create logfile ("w")
+        print(f"{datetime.datetime.now()} \t\t {iteration}: Started Processing")
         with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "w") as f:
-            print(f"{datetime.datetime.now()} \t\t {iter}: Started Processing", file=f)
+            print(f"{datetime.datetime.now()} \t\t {iteration}: Started Processing", file=f)
     else:
         # record in existing file
+        print(f"{datetime.datetime.now()} \t\t {iteration}: Started Processing")
         with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
-            print(f"{datetime.datetime.now()} \t\t {iter}: Started Processing", file=f)
+            print(f"{datetime.datetime.now()} \t\t {iteration}: Started Processing", file=f)
 
 
     # (1) perturb coordinates --------------------- ---------------------------------- -----------------------------------
     # read in coords
+    print(iteration, "reading coords")
     path_coords = glob.glob(os.path.join(path_station_gps, "*.csv" ))[0]
     coords = pd.read_csv(path_coords)
     # convert GPS perturbation from m to lat/lon degrees
@@ -41,8 +44,9 @@ def main(path_mseed, path_station_gps, path_save,
     coords["Longitude"] = coords["Longitude"] + lon_perturb
 
     # (2) load in raw data with perturbed coordinates -------------------------------------------------------------------
+    print(iteration, "loading data")
     data = utils.load_data(path_mseed, path_coords=coords, array_str=array_str,
-            gem_include=None, gem_exclude=None,
+            gem_include=None, gem_exclude=["TOP32", "TOP07"],
             time_start=time_start, time_stop=time_stop,
             freqmin=freqmin, freqmax=freqmax)
 
@@ -50,20 +54,23 @@ def main(path_mseed, path_station_gps, path_save,
 
     # test if any sensors stopped recording before specified time_stop
     station_stop = np.array([data.traces[i].stats["endtime"] == time_stop for i in range(len(data.traces))])
+    print(station_stop)
 
     if np.all(station_stop):    # all sensors recorded entire duration
+        print(iteration, "all recorded entire time")
         # define path to save resulting output
-        path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iter{iter}.pkl")
+        path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iteration{iteration}.pkl")
         output = beamform.process_data(data, path_processed=path_processed, 
                                         time_start=time_start, time_stop=time_stop,
                                         freqmin=freqmin, freqmax=freqmax)
 
     else:   # one or more sensors cut out early
+        print(iteration, "cut out early")
         idxs = np.where(~station_stop)[0]
         for i in np.where(~station_stop)[0]:
             # run beamforming once with all sensors until early stop time
             time_stop_early = data.traces[i].stats["endtime"]
-            path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iter{iter}_a.pkl")
+            path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iteration{iteration}_a.pkl")
             output = beamform.process_data(data, path_processed=path_processed, 
                                             time_start=time_start, time_stop=time_stop_early,
                                             freqmin=freqmin, freqmax=freqmax)
@@ -71,14 +78,15 @@ def main(path_mseed, path_station_gps, path_save,
             for tr in data.select(station=data.traces[i].stats['station']): 
                 # obspy's ugly way to remove a traces from the stream... yuck
                 data.remove(tr)
-            path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iter{iter}_b.pkl")
+            path_processed = os.path.join(path_save, f"output_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m_iteration{iteration}_b.pkl")
             output = beamform.process_data(data, path_processed=path_processed, 
                                             time_start=time_stop_early, time_stop=time_stop,
                                             freqmin=freqmin, freqmax=freqmax)
 
     # LOG: record processing end time
+    print(f"{datetime.datetime.now()} \t\t {iteration}: Finished Processing")
     with open(os.path.join(path_save, f"pylog_{array_str}_{freqmin}-{freqmax}Hz_{gps_perturb_scale}m.txt"), "a") as f:
-        print(f"{datetime.datetime.now()} \t\t {iter}: Finished Processing", file=f)
+        print(f"{datetime.datetime.now()} \t\t {iteration}: Finished Processing", file=f)
 
     return
 
@@ -122,11 +130,31 @@ if __name__ == "__main__":
     time_start = UTCDateTime(2023, 10, 5, 0, 0, 0)
     time_stop = UTCDateTime(2023, 10, 8, 0, 0, 0)
 
-    freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
-    n_iters = 1000
-    settings.set_paths(location='laptop')
+    #freq_list = [(0.5, 2.0), (2.0, 4.0), (4.0, 8.0), (8.0, 16.0), (24.0, 32.0)]
+    n_iters = 100
+    settings.set_paths(location='borah')
 
-    #with ProcessPoolExecutor(max_workers=48) as pool:
+    freqmin = 24.0
+    freqmax = 32.0
+
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        # run each iteration within each freq band in parallel
+        args_list = [[settings.path_mseed, settings.path_station_gps, 
+                      os.path.join(settings.path_processed, "uncert_results"), 
+                      args.array_str, time_start, time_stop, 
+                      freqmin, freqmax, 
+                      args.gps_perturb_scale, i] 
+                      for i in range(n_iters)] 
+        result = pool.map(main, *zip(*args_list))
+    #try running without parallel????
+    #for i in range(n_iters):
+    #    main(settings.path_mseed, settings.path_station_gps, 
+    #          os.path.join(settings.path_processed, "uncert_results"), 
+    #          args.array_str, time_start, time_stop, 
+    #          freqmin, freqmax, 
+    #          args.gps_perturb_scale, i)
+
+    #with ProcessPoolExecutor(max_workers=12) as pool:
     #    # run each iteration within each freq band in parallel
     #    args_list = [[settings.path_mseed, settings.path_station_gps, 
     #                  os.path.join(settings.path_processed, "uncert_results"), 
@@ -136,16 +164,11 @@ if __name__ == "__main__":
     #                  for freqmin,freqmax in freq_list for i in range(n_iters)] 
     #    result = pool.map(main, *zip(*args_list))
 
-    freqmin = 0.5
-    freqmax = 2.0
-    i = 0
-    main(settings.path_mseed, settings.path_station_gps,
-         os.path.join(settings.path_processed, "uncert_results"),
-         "JDSA", time_start, time_stop, freqmin, freqmax, 0.5, i)
-    
-
-
-    #with open(os.path.join(path_save, f"pylog_{args.array_str}_{freqmin}-{freqmin}Hz_{args.gps_perturb_scale}m.txt"), "a") as f:
-    #    print(f"{datetime.datetime.now()} \t\t Completed Processing", file=f)
-
+    #freqmin = 0.5
+    #freqmax = 2.0
+    #i = 0  
+    #print("Entering main")
+    #main(settings.path_mseed, settings.path_station_gps,
+    #     os.path.join(settings.path_processed, "uncert_results"),
+    #     "TOP", time_start, time_stop, freqmin, freqmax, 0.5, i)
     
